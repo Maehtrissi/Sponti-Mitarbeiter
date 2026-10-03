@@ -1,0 +1,6 @@
+{
+  "name": "Sponti B2B Core Platform",
+  "description": "B2B Partnernetzwerk- und Betriebsmanagement-Plattform für Sponti – Steuerung von Partnerunternehmen, Spontan-Deals, Mitgliederverwaltung und Live-Aktivitäten.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
