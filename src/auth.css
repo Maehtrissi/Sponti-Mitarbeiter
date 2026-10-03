@@ -1,0 +1,19 @@
+.auth-page { min-height: 100dvh; display: grid; place-items: center; padding: 32px 20px; background: linear-gradient(135deg, #eaf6ed, #f5f7fb 55%, #fff1e8); color: #19342d; font-family: 'Inter', sans-serif; }
+.auth-card { width: min(100%, 440px); padding: clamp(26px, 5vw, 44px); background: #fff; border: 1px solid #e3ebe7; border-radius: 24px; box-shadow: 0 20px 60px #19342d12; }
+.auth-brand { display: flex; align-items: center; gap: 12px; color: #006c63; font-size: 28px; font-weight: 700; text-decoration: none; }
+.auth-brand span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #55665f; background: #f1f5f3; padding: 6px 9px; border-radius: 6px; }
+.auth-eyebrow { margin-top: 36px; font-size: 12px; color: #006c63; font-weight: 700; }
+.auth-card h1 { margin: 12px 0; font-size: clamp(27px, 5vw, 34px); line-height: 1.15; font-weight: 700; }
+.auth-intro, .auth-help { color: #576b63; font-size: 14px; line-height: 1.6; }
+.auth-card form { display: grid; margin-top: 26px; gap: 10px; }
+.auth-card label { font-size: 14px; font-weight: 600; }
+.auth-card input { width: 100%; border: 1px solid #bdcec7; border-radius: 10px; padding: 13px 14px; font-size: 16px; background: #fff; color: #19342d; margin-bottom: 12px; }
+.auth-card input:focus-visible, .auth-card button:focus-visible, .auth-account button:focus-visible { outline: 3px solid #f48a52; outline-offset: 3px; }
+.auth-submit { border: 0; border-radius: 10px; background: #007d70; color: #fff; padding: 14px; font-weight: 700; cursor: pointer; }
+.auth-submit:hover { background: #00665c; }
+.auth-submit:disabled { opacity: .65; cursor: wait; }
+.auth-error { color: #a12b2b; font-size: 14px; line-height: 1.5; margin: 0 0 10px; }
+.auth-help { font-size: 12px; margin-top: 24px; }
+.auth-account { position: fixed; right: 20px; bottom: 18px; z-index: 60; display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 40px); padding: 10px 14px; border-radius: 12px; background: #fff; box-shadow: 0 4px 20px #19342d22; color: #19342d; font-size: 12px; }
+.auth-account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auth-account button { background: #007d70; color: #fff; border: 0; border-radius: 6px; padding: 8px 12px; cursor: pointer; }

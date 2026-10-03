@@ -19,7 +19,9 @@ jobs:
         with:
           node-version: 22
       - uses: actions/configure-pages@v5
-      - run: npm install
+      - run: npm ci
+      - run: node --experimental-strip-types --test src/lib/employeeAccess.test.ts
+      - run: npm run lint
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
