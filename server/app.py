@@ -220,6 +220,15 @@ def create_app(config=None):
             abort(409, description='Diese E-Mail ist bereits vorhanden.')
         return jsonify(ok=True)
 
+    @app.post('/api/contacts/<identifier>/approve')
+    def approve_provider(identifier):
+        require_contact(identifier)
+        changed=db().execute("UPDATE contacts SET status='Partner' WHERE id=? AND kind='provider' AND archived_at IS NULL", (identifier,)).rowcount
+        if changed == 0:
+            abort(400, description='Nur aktive Kursanbieter-Anfragen können bestätigt werden.')
+        db().commit()
+        return jsonify(ok=True)
+
     @app.delete('/api/contacts/<identifier>')
     def archive_contact(identifier):
         require_contact(identifier)

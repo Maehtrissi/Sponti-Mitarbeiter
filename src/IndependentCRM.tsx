@@ -96,7 +96,7 @@ export default function IndependentCRM({request=serverApi,storageLabel='Eigene D
   async function approveProvider(contact:Contact) {
     if(!window.confirm(`${contact.company||contact.name} als Kursanbieter bestätigen? Das Unternehmen wird danach unter Kursanbieter geführt.`)) return;
     await perform(async()=> {
-      await api(`contacts/${contact.id}`,session!.csrf,'PUT',{...contact,status:'Partner'});
+      await api(`contacts/${contact.id}/approve`,session!.csrf,'POST',{});
       await reload();setSelected(null);setEditor(null);
       setNotice(`${contact.company||contact.name} wurde bestätigt und zu den Kursanbietern verschoben.`);
     });

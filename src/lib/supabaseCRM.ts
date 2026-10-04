@@ -53,6 +53,13 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     const {data,error}=result;check(error);
     return {id:`${contact.kind}:${data!.id}`} as T;
   }
+  const approvalMatch=path.match(/^contacts\/([^/]+)\/approve$/);
+  if(approvalMatch && method==='POST') {
+    const reference=contactReference(approvalMatch[1]);
+    if(!reference.provider_id) throw new Error('Nur Kursanbieter können bestätigt werden.');
+    const {data,error}=await supabase.from('Kursanbieter').update({crm_status:'Partner'}).eq('id',reference.provider_id).is('archived_at',null).select('id').single();
+    check(error);if(!data) throw new Error('Anfrage konnte nicht bestätigt werden.');return {ok:true} as T;
+  }
   const archiveMatch=path.match(/^contacts\/([^/]+)(\/restore)?$/);
   if(archiveMatch && (method==='DELETE'||(method==='POST'&&archiveMatch[2]))) {
     const id=archiveMatch[1];contactReference(id);
