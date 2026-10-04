@@ -46,6 +46,14 @@ class CRMTest(unittest.TestCase):
         task=restart.get('/api/tasks').json[0]
         self.assertEqual(self.client.put('/api/tasks/'+task['id'],json={'done':True},headers=self.headers).status_code,200)
         self.assertEqual(restart.get('/api/tasks').json[0]['done'],1)
+    def test_archive_restore_keeps_related_notes(self):
+        identifier=self.add()
+        self.client.post(f'/api/contacts/{identifier}/notes',json={'body':'Keep note'},headers=self.headers)
+        self.assertEqual(self.client.delete('/api/contacts/'+identifier,json={},headers=self.headers).status_code,200)
+        self.assertTrue(self.client.get('/api/contacts').json[0]['archived_at'])
+        self.assertEqual(self.client.post('/api/contacts/'+identifier+'/restore',json={},headers=self.headers).status_code,200)
+        self.assertIsNone(self.client.get('/api/contacts').json[0]['archived_at'])
+        self.assertEqual(self.client.get(f'/api/contacts/{identifier}/notes').json[0]['body'],'Keep note')
     def test_import_validation_atomicity_and_duplicates(self):
         invalid='Name,Email,Phone,Interest,ContactChannel\nA,a@example.org,123,Kochen,Beides\nB,invalid,123,Tanzen,E-Mail\n'
         r=self.client.post('/api/import',json={'kind':'customer','csv':invalid},headers=self.headers)

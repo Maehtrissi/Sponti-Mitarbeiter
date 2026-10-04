@@ -15,6 +15,10 @@ values ('CRM test company','CRM test contact','provider-test@example.invalid','E
 insert into public.crm_notes(customer_id,body) values (customer,'CRM rollback test');
 insert into public.crm_tasks(provider_id,title,due_date) values (provider,'CRM rollback task',current_date) returning id into task;
 update public.crm_tasks set done=true where id=task;
+update public."Kunden - Users" set archived_at=now() where id=customer;
+if (select archived_at from public."Kunden - Users" where id=customer) is null then raise exception 'Archive failed'; end if;
+update public."Kunden - Users" set archived_at=null where id=customer;
+if (select archived_at from public."Kunden - Users" where id=customer) is not null then raise exception 'Restore failed'; end if;
 if not (select done from public.crm_tasks where id=task) then raise exception 'Task persistence failed'; end if;
 if (select crm_status from public."Kunden - Users" where id=customer)<>'Pausiert' then raise exception 'Customer status failed'; end if;
 if not exists(select 1 from public.crm_notes where customer_id=customer and body='CRM rollback test') then raise exception 'Note persistence failed'; end if;

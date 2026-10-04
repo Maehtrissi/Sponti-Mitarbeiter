@@ -53,6 +53,8 @@ def create_app(config=None):
         CREATE TABLE IF NOT EXISTS attempts(bucket TEXT NOT NULL, happened REAL NOT NULL);
         CREATE INDEX IF NOT EXISTS attempts_time ON attempts(happened);
         ''')
+        if 'archived_at' not in [r[1] for r in db().execute('PRAGMA table_info(contacts)')]:
+            db().execute('ALTER TABLE contacts ADD COLUMN archived_at TEXT')
         db().commit()
 
     def throttle(bucket, limit, window):
@@ -216,6 +218,20 @@ def create_app(config=None):
             db().commit()
         except sqlite3.IntegrityError:
             abort(409, description='Diese E-Mail ist bereits vorhanden.')
+        return jsonify(ok=True)
+
+    @app.delete('/api/contacts/<identifier>')
+    def archive_contact(identifier):
+        require_contact(identifier)
+        db().execute("UPDATE contacts SET archived_at=strftime('%Y-%m-%dT%H:%M:%SZ','now') WHERE id=?", (identifier,))
+        db().commit()
+        return jsonify(ok=True)
+
+    @app.post('/api/contacts/<identifier>/restore')
+    def restore_contact(identifier):
+        require_contact(identifier)
+        db().execute('UPDATE contacts SET archived_at=NULL WHERE id=?', (identifier,))
+        db().commit()
         return jsonify(ok=True)
 
     @app.get('/api/contacts/<identifier>/notes')

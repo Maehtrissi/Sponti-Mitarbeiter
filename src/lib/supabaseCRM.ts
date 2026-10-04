@@ -53,6 +53,15 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     const {data,error}=result;check(error);
     return {id:`${contact.kind}:${data!.id}`} as T;
   }
+  const archiveMatch=path.match(/^contacts\/([^/]+)(\/restore)?$/);
+  if(archiveMatch && (method==='DELETE'||(method==='POST'&&archiveMatch[2]))) {
+    const id=archiveMatch[1];contactReference(id);
+    const update={archived_at:archiveMatch[2]?null:new Date().toISOString()};
+    const result=id.startsWith('customer:')
+      ? await supabase.from('Kunden - Users').update(update).eq('id',Number(id.split(':')[1])).select('id').single()
+      : await supabase.from('Kursanbieter').update(update).eq('id',id.split(':')[1]).select('id').single();
+    check(result.error);if(!result.data) throw new Error('Kontakt konnte nicht geändert werden.');return {ok:true} as T;
+  }
   const contactMatch=path.match(/^contacts\/([^/]+)(\/notes)?$/);
   if(contactMatch) {
     const id=contactMatch[1], reference=contactReference(id);

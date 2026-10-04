@@ -156,3 +156,6 @@ npm run build
 
 Die Tests prüfen Zugriffsschutz, CSRF, Origin, Abmeldung, dauerhafte Speicherung,
 Notizen, Aufgaben, Importvalidierung, Duplikate und öffentliche Formularvalidierung.
+
+## Kontakte bearbeiten und löschen
+In Kunden- und Anbieterlisten gibt es direkte Aktionen zum Bearbeiten und Löschen. Löschen verschiebt Kontakte ins Archiv; dort ist Wiederherstellen möglich. Notizen und Aufgaben bleiben zugeordnet. Es gibt keine automatische oder endgültige Löschung. Archivierte Kontakte sind im vollständigen Export enthalten.

@@ -1,4 +1,4 @@
-export type CRMContact = {id:string;kind:'customer'|'provider';name:string;email:string;phone:string;company:string;interest:string;channel:string;offer_type:string;status:string;message:string;source:string;created_at:string};
+export type CRMContact = {id:string;kind:'customer'|'provider';name:string;email:string;phone:string;company:string;interest:string;channel:string;offer_type:string;status:string;message:string;source:string;created_at:string;archived_at?:string|null};
 export const categories = ['Yoga & Wellness','Kochen & Genießen','Kunst & Handwerk','Fotografie & Design','Tanz & Bewegung','Natur & Draußen','Etwas anderes'];
 export function contactReference(id:string) {
   const [kind,value,...extra] = id.split(':');
@@ -9,11 +9,11 @@ export function contactReference(id:string) {
 }
 export function mapCustomer(row:Record<string,unknown>):CRMContact {
   const s=(key:string)=>String(row[key]??'');
-  return {id:`customer:${row.id}`,kind:'customer',name:s('Name'),email:s('Email'),phone:s('Phone'),company:'',interest:s('Interest'),channel:s('ContactChannel'),offer_type:'',status:s('crm_status')||'Aktiv',message:s('crm_message'),source:s('crm_source')||'Website',created_at:s('created_at')};
+  return {id:`customer:${row.id}`,kind:'customer',name:s('Name'),email:s('Email'),phone:s('Phone'),company:'',interest:s('Interest'),channel:s('ContactChannel'),offer_type:'',status:s('crm_status')||'Aktiv',message:s('crm_message'),source:s('crm_source')||'Website',created_at:s('created_at'),archived_at:s('archived_at')||null};
 }
 export function mapProvider(row:Record<string,unknown>):CRMContact {
   const s=(key:string)=>String(row[key]??'');
-  return {id:`provider:${row.id}`,kind:'provider',name:s('contact'),email:s('email'),phone:s('phone'),company:s('company'),interest:s('category'),channel:'',offer_type:s('offer_type'),status:s('crm_status')||'Neu',message:s('message'),source:s('crm_source')||'Website',created_at:s('created_at')};
+  return {id:`provider:${row.id}`,kind:'provider',name:s('contact'),email:s('email'),phone:s('phone'),company:s('company'),interest:s('category'),channel:'',offer_type:s('offer_type'),status:s('crm_status')||'Neu',message:s('message'),source:s('crm_source')||'Website',created_at:s('created_at'),archived_at:s('archived_at')||null};
 }
 export function contactPayload(contact:CRMContact, creating=false):Record<string,string|null> {
   if(!contact.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email.trim())) throw new Error('Bitte Name und gültige E-Mail angeben.');

@@ -124,6 +124,7 @@ export type Database = {
       }
       "Kunden - Users": {
         Row: {
+          archived_at: string | null
           ContactChannel: string | null
           created_at: string
           crm_message: string
@@ -136,6 +137,7 @@ export type Database = {
           Phone: string | null
         }
         Insert: {
+          archived_at?: string | null
           ContactChannel?: string | null
           created_at?: string
           crm_message?: string
@@ -148,6 +150,7 @@ export type Database = {
           Phone?: string | null
         }
         Update: {
+          archived_at?: string | null
           ContactChannel?: string | null
           created_at?: string
           crm_message?: string
@@ -163,6 +166,7 @@ export type Database = {
       }
       Kursanbieter: {
         Row: {
+          archived_at: string | null
           category: string
           company: string
           contact: string
@@ -176,6 +180,7 @@ export type Database = {
           phone: string
         }
         Insert: {
+          archived_at?: string | null
           category: string
           company: string
           contact: string
@@ -189,6 +194,7 @@ export type Database = {
           phone?: string
         }
         Update: {
+          archived_at?: string | null
           category?: string
           company?: string
           contact?: string
