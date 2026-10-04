@@ -12,6 +12,9 @@ values ('CRM integration test','crm-test@example.invalid','+41790000000','Kochen
 update public."Kunden - Users" set crm_status='Pausiert' where id=customer;
 insert into public."Kursanbieter" (company,contact,email,category,offer_type,crm_source)
 values ('CRM test company','CRM test contact','provider-test@example.invalid','Etwas anderes','Beides','CRM') returning id into provider;
+if (select crm_status from public."Kursanbieter" where id=provider)<>'Neu' then raise exception 'Provider bypasses request stage'; end if;
+update public."Kursanbieter" set crm_status='Partner' where id=provider;
+if (select crm_status from public."Kursanbieter" where id=provider)<>'Partner' then raise exception 'Provider approval failed'; end if;
 insert into public.crm_notes(customer_id,body) values (customer,'CRM rollback test');
 insert into public.crm_tasks(provider_id,title,due_date) values (provider,'CRM rollback task',current_date) returning id into task;
 update public.crm_tasks set done=true where id=task;
@@ -50,6 +53,11 @@ do $$ begin
 begin perform * from public."Kunden - Users"; raise exception 'Anonymous read allowed'; exception when insufficient_privilege then null; end;
 begin perform * from public.crm_notes; raise exception 'Anonymous notes read allowed'; exception when insufficient_privilege then null; end;
 insert into public."Kunden - Users" ("Name","Email","Phone","Interest","ContactChannel") values ('Website rollback test','website-test@example.invalid','0791234567','Yoga','E-Mail');
+begin
+insert into public."Kursanbieter" (company,contact,email,category,offer_type,crm_status) values ('Unauthorized approval','Test','no-approval@example.invalid','Etwas anderes','Beides','Partner');
+raise exception 'Public self approval allowed';
+exception when insufficient_privilege then null;
+end;
 insert into public."Kursanbieter" (company,contact,email,category,offer_type,message) values ('Website rollback provider','Test contact','web-provider@example.invalid','Etwas anderes','Mehrere Kurse','Test');
 end $$;
 reset role;

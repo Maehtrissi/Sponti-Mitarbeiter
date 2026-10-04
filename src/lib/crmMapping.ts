@@ -26,3 +26,10 @@ export function contactPayload(contact:CRMContact, creating=false):Record<string
   if(!contact.company.trim() || contact.company.length>200 || !categories.includes(contact.interest) || !['Einzelne Kurse','Mehrere Kurse','Beides'].includes(contact.offer_type)) throw new Error('Bitte Unternehmen, Kategorie und Kursangebot auswählen.');
   return {...common,company:contact.company.trim(),contact:contact.name.trim(),email:contact.email.trim(),phone:contact.phone.trim(),category:contact.interest,offer_type:contact.offer_type,message:contact.message.trim()};
 }
+
+export function isApprovedProvider(contact:CRMContact) {
+  return contact.kind==='provider' && !contact.archived_at && contact.status==='Partner';
+}
+export function isProviderRequest(contact:CRMContact) {
+  return contact.kind==='provider' && !contact.archived_at && contact.status!=='Partner';
+}

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {mapCustomer,mapProvider,contactPayload,contactReference} from './crmMapping.ts';
+import {mapCustomer,mapProvider,contactPayload,contactReference,isApprovedProvider,isProviderRequest} from './crmMapping.ts';
 
 test('keeps phone numbers, channel preferences and existing customer IDs',()=>{
   const person=mapCustomer({id:12,Name:'Anna',Email:'anna@example.org',Phone:'+41 079 012 34 56',ContactChannel:'WhatsApp',Interest:'Yoga'});
@@ -28,4 +28,17 @@ test('rejects invalid contact IDs and invalid email addresses',()=>{
   for(const id of ['customer:abc','provider:1','customer:1:extra','customer:9007199254740993']) assert.throws(()=>contactReference(id));
   const person=mapCustomer({id:1,Name:'Test',Email:'invalid'});
   assert.throws(()=>contactPayload(person));
+});
+
+test('website submissions remain requests until staff confirm them',()=>{
+  const request=mapProvider({id:'0e8ccf9d-1b77-4a42-8c57-f0de53e3cc42',contact:'Tom',company:'Studio',email:'tom@example.org',category:'Yoga & Wellness',offer_type:'Beides'});
+  for(const status of ['Neu','Kontaktiert','Gespräch','Abgelehnt']) {
+    assert.equal(isProviderRequest({...request,status}),true);
+    assert.equal(isApprovedProvider({...request,status}),false);
+  }
+  const approved={...request,status:'Partner'};
+  assert.equal(isApprovedProvider(approved),true);
+  assert.equal(isProviderRequest(approved),false);
+  assert.equal(isApprovedProvider({...approved,archived_at:'2026-10-04T10:00:00Z'}),false);
+  assert.equal(isProviderRequest({...request,archived_at:'2026-10-04T10:00:00Z'}),false);
 });
