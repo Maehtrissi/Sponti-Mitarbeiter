@@ -6,7 +6,7 @@ import type {CRMRequest} from '../IndependentCRM';
 
 type TaskRow={id:string;customer_id:string|number|null;provider_id:string|null;title:string;due_date:string;done:boolean;created_at:string};
 function check(error:{message:string}|null) {if(error) throw new Error(error.message);}
-async function allRows(table:'Kunden - Users'|'Kursanbieter'|'crm_notes'|'crm_tasks', order='created_at') {
+async function allRows(table:'Kunden - Users'|'Kursanbieter'|'crm_notes'|'crm_tasks'|'courses', order='created_at') {
   const rows:Record<string,unknown>[]=[];
   // Paginate beyond Supabase's default 1000-row response limit.
   for(let offset=0;;offset+=500) {
@@ -101,8 +101,8 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     if(!data) throw new Error('Aufgabe konnte nicht gespeichert werden.');return {ok:true} as T;
   }
   if(path==='export') {
-    const [people,notes,tasks]=await Promise.all([contacts(),allRows('crm_notes'),taskList()]);
-    return {version:1,contacts:people,notes,tasks} as T;
+    const [people,notes,tasks,courses]=await Promise.all([contacts(),allRows('crm_notes'),taskList(),allRows('courses')]);
+    return {version:2,contacts:people,notes,tasks,courses} as T;
   }
   throw new Error('Diese Funktion ist in diesem CRM nicht verfügbar.');
 };

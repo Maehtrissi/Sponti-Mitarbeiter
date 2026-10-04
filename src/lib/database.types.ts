@@ -14,6 +14,65 @@ export type Database = {
   }
   public: {
     Tables: {
+      courses: {
+        Row: {
+          archived_at: string | null
+          booking_url: string
+          category: string
+          created_at: string
+          description: string
+          id: string
+          price: number
+          provider_id: string | null
+          region: string
+          seats: number
+          starts_at: string
+          status: string
+          title: string
+          venue: string
+        }
+        Insert: {
+          archived_at?: string | null
+          booking_url?: string
+          category: string
+          created_at?: string
+          description?: string
+          id?: string
+          price?: number
+          provider_id?: string | null
+          region: string
+          seats?: number
+          starts_at: string
+          status?: string
+          title: string
+          venue: string
+        }
+        Update: {
+          archived_at?: string | null
+          booking_url?: string
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          price?: number
+          provider_id?: string | null
+          region?: string
+          seats?: number
+          starts_at?: string
+          status?: string
+          title?: string
+          venue?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "Kursanbieter"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crm_employees: {
         Row: {
           active: boolean

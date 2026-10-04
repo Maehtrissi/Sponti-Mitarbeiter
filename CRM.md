@@ -164,3 +164,10 @@ In Kunden- und Anbieterlisten gibt es direkte Aktionen zum Bearbeiten und Lösch
 Website-Anfragen erhalten automatisch den Status `Neu` und erscheinen im Bereich Anfragen. Auch `Kontaktiert`, `Gespräch` und `Abgelehnt` bleiben dort filterbar. Nur `Partner` erscheint unter Kursanbieter. Der Button Bestätigen setzt diesen Status dauerhaft. Unbestätigte Unternehmen können im Editor noch nicht den Status Partner wählen; dafür gibt es die ausdrückliche Bestätigung. Freigaben sind nur für Mitarbeiter möglich, öffentliche Formulare dürfen die Statusspalte nicht setzen. Es werden keine E-Mails versendet und keine Kurse automatisch veröffentlicht.
 
 Kursanbieter können im öffentlichen Formular optional eine Telefonnummer (`phone`) angeben. Sie erscheint in den Anfragen und lässt sich im CRM bearbeiten. Das Website-Feld ist für später vorgesehen und derzeit ausgeblendet. Bereits gespeicherte Website-Daten bleiben erhalten. Die Telefonnummer bestätigt den Anbieter nicht automatisch.
+
+
+## Kurse verwalten
+
+Im Supabase-CRM enthält „Kurse“ eigene Kurse mit Titel, Beschreibung, Kategorie, Region, Treffpunkt, Termin, Preis in CHF, freien Plätzen und optionalem Buchungslink. Neue Kurse starten als Entwurf; die Zuordnung zu einem bestätigten Anbieter ist optional. Veröffentlichen und Zurück zu Entwurf steuern die öffentliche Sichtbarkeit. Vergangene Termine, ausgebuchte und archivierte Kurse erscheinen öffentlich nicht. Löschen archiviert; Wiederherstellen macht den Kurs wieder zum Entwurf. Der JSON-Export umfasst auch Kurse.
+
+Die öffentliche Seite liest nur öffentliche Kursfelder über RLS und enthält keine Beispielkurse mehr. Die Kursverwaltung ist Teil des aktiven Supabase-Modus. Der alternative SQLite-Modus bleibt für Kontakte, Notizen und Aufgaben bestehen.
