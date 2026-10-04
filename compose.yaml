@@ -1,0 +1,13 @@
+services:
+  crm:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      CRM_PUBLIC_ORIGIN: ${CRM_PUBLIC_ORIGIN:?Set CRM_PUBLIC_ORIGIN to the HTTPS CRM URL}
+      CRM_WEBSITE_ORIGIN: https://sponti-switzerland.ch
+    volumes:
+      - crm-data:/data
+volumes:
+  crm-data:

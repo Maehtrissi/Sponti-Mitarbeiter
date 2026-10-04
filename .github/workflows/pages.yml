@@ -21,7 +21,13 @@ jobs:
       - uses: actions/configure-pages@v5
       - run: npm ci
       - run: node --experimental-strip-types --test src/lib/employeeAccess.test.ts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r server/requirements.txt
+      - run: python -m unittest server.test_app
       - run: npm run lint
+      - run: npm run build:crm
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

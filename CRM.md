@@ -1,0 +1,115 @@
+# Sponti CRM mit eigener Datenbank
+
+Die Mitarbeiterseite erhält eine zweite Betriebsart mit eigener SQLite-Datenbank,
+eigenständiger Mitarbeiteranmeldung und einer Flask-API. In diesem Modus wird
+Supabase weder für die Anmeldung noch für Datenzugriffe benötigt.
+
+Funktionen: Kunden und Kursanbieter erfassen/bearbeiten/suchen/filtern, Kontaktkanäle
+und Kursarten, Anbieterstatus, Notizen mit Autor/Datum, Aufgaben mit Fälligkeit und
+Erledigungsstatus, CSV-Import der bestehenden Supabase-Tabellen und JSON-Export.
+Keine Beispieldaten, kein simulierter Nachrichtenversand. E-Mail-/WhatsApp-Versand,
+Kursveröffentlichung, Buchungen und automatische Erinnerungen sind nicht integriert.
+
+Die bestehende GitHub-Pages-Version bleibt bis zur Umstellung im bisherigen Modus.
+Pages kann keinen Python-Server und keine private SQLite-Datenbank ausführen.
+
+## Lokal starten
+
+Python 3.12+, Node 22+:
+
+```sh
+npm ci
+python3 -m venv .venv
+.venv/bin/pip install -r server/requirements.txt
+.venv/bin/python -m flask --app server.app:create_app create-admin
+CRM_LOCAL_HTTP=1 .venv/bin/python -m flask --app server.app:create_app run --host 127.0.0.1 --port 5000
+```
+
+In einem zweiten Terminal `npm run dev:crm` starten und http://localhost:3000 öffnen.
+Das Administrator-Passwort wird interaktiv verdeckt abgefragt und mit scrypt gehasht.
+Es gibt kein vorgegebenes Passwort und keine öffentliche Registrierung.
+`create-admin` für eine vorhandene E-Mail setzt das Passwort neu und beendet deren
+Sitzungen. Lokales HTTP nur für Entwicklung, `CRM_LOCAL_HTTP` nie online setzen.
+
+## Auf einem Server installieren
+
+Ein Server mit Docker, persistentem Speicher und HTTPS wird benötigt. CRM-Oberfläche
+und API liegen auf derselben Domain, beispielsweise https://crm.sponti-switzerland.ch.
+Der DNS-Eintrag und das Hosting sind noch einzurichten; diese URL ist ein Beispiel.
+
+```sh
+export CRM_PUBLIC_ORIGIN=https://crm.sponti-switzerland.ch
+docker compose up -d --build
+docker compose exec crm python -m flask --app server.app:create_app create-admin
+```
+
+Einen HTTPS-Reverse-Proxy vor `127.0.0.1:5000` setzen (z. B. Caddy oder nginx).
+Originalen Origin-Header weitergeben, Host auf die CRM-Domain begrenzen. Gunicorn ist
+nur lokal am Host veröffentlicht. Das Volume `crm-data` dauerhaft behalten. Bei
+benannten Volumes muss der Pfad `/data` dem Container-Nutzer UID 10001 gehören.
+In der Proxy-Konfiguration Login und öffentliche Formulare zusätzlich je Client-IP
+begrenzen. Die API hat eigene Limits je Socket-IP und E-Mail; hinter einem Proxy
+teilen sich Clients die Socket-IP. Keine ungeprüften X-Forwarded-For-Header vertrauen.
+
+Die Anmeldung verwendet zufällige serverseitige Sitzungen (8 Stunden), HttpOnly/
+Secure/SameSite-Cookies, CSRF-Token und Origin-Prüfung. API-Daten sind ausschliesslich
+für angelegte Mitarbeiter zugänglich. Die öffentlichen Endpunkte sind nur zum
+Einreichen, nicht zum Lesen von Kontakten vorgesehen. Zusätzlicher Bot-Schutz kann
+bei erhöhtem Spamaufkommen ergänzt werden.
+
+## Supabase schrittweise ablösen
+
+1. Neues CRM auf dem Server installieren und Administrator anlegen.
+2. Beide Tabellen in Supabase als CSV exportieren und in „Datenübernahme“ dem richtigen
+   Kontakttyp zuordnen. Kunden: `Name,Email,Phone,Interest,ContactChannel`.
+   Anbieter: `company,contact,email,offer_type,category,message`.
+   Der Import prüft zuerst sämtliche Zeilen. Doppelte E-Mail-Adressen je Kontakttyp
+   werden übersprungen; Telefonnummern und Kontaktkanäle bleiben Zeichenketten.
+3. Anzahl und Inhalte mit dem Export vergleichen. CSVs sicher aufbewahren.
+4. Website-Formulare auf die neue API umstellen. Der Browser bekommt keinen geheimen
+   Schlüssel. POST JSON an `https://<CRM-Domain>/api/public/customers` mit
+   `name,email,phone,interest,channel`; bzw. `/api/public/providers` mit
+   `company,name,email,offer_type,interest,message`. Kundenkanäle: `WhatsApp`,
+   `E-Mail`, `Beides`; Kursarten: `Einzelne Kurse`, `Mehrere Kurse`, `Beides`.
+   Optionales Honeypot-Feld `website` leer mitsenden. Erfolg nur bei HTTP 201 anzeigen.
+   CORS ist auf `https://sponti-switzerland.ch` begrenzt. Die Origin-Prüfung ist kein
+   Bot-Schutz; öffentliche Formular-APIs bleiben grundsätzlich öffentlich einreichbar.
+5. Während des Übergangs neue Supabase-Einträge nochmals exportieren und importieren,
+   bevor die alte Erfassung abgeschaltet wird. Bereits importierte Einträge werden
+   übersprungen; Änderungen an bestehenden Kontakten müssen abgeglichen werden.
+6. Beide Formulare mit Testdaten prüfen: Telefon, Kanal und Kursart kontrollieren;
+   nach Neuladen und erneuter Anmeldung müssen die Daten erhalten bleiben.
+7. Konsistente Datenbanksicherung anlegen, Wiederherstellung testen. Erst dann
+   Supabase-Abhängigkeit aus Website und alter Anmeldung entfernen und das alte
+   Projekt abschalten. Das geschieht nicht automatisch durch diesen Code.
+
+## Sicherungen und Wiederherstellung
+
+```sh
+docker compose exec crm python -m flask --app server.app:create_app backup
+```
+
+Als Ziel beispielsweise `/data/backup-2026-10-04.sqlite` eingeben und die Datei über
+`docker compose cp crm:/data/backup-2026-10-04.sqlite ./backup.sqlite` auf einen
+separaten sicheren Speicher kopieren. Die Sicherung enthält auch Passwort-Hashes
+und Sitzungen, also vertraulich behandeln. Regelmässige automatisierte Sicherungen
+sind vor produktiver Nutzung einzurichten. Der JSON-Export enthält nur die CRM-Daten;
+ein JSON-Rückimport ist nicht implementiert und ersetzt die vollständige Sicherung nicht.
+
+Zur Wiederherstellung Container stoppen, Sicherung als `/data/crm.sqlite` im Volume
+einspielen, dazugehörige alte `crm.sqlite-wal`/`crm.sqlite-shm` entfernen und Eigentümer
+UID 10001 setzen. Vor Neustart Sitzungen aus der wiederhergestellten DB löschen
+(`DELETE FROM sessions;`), damit alte Cookies nicht erneut gültig werden. Zuerst mit
+einer separaten Testinstallation prüfen, dann den echten Dienst ersetzen.
+
+## Prüfen
+
+```sh
+.venv/bin/python -m unittest server.test_app
+npm run lint
+npm run build:crm
+npm run build
+```
+
+Die Tests prüfen Zugriffsschutz, CSRF, Origin, Abmeldung, dauerhafte Speicherung,
+Notizen, Aufgaben, Importvalidierung, Duplikate und öffentliche Formularvalidierung.

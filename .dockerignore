@@ -1,0 +1,8 @@
+node_modules
+.git
+dist
+private-data
+*.sqlite*
+*.csv
+.env*
+__pycache__
