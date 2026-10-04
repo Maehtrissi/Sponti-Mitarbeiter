@@ -162,3 +162,5 @@ In Kunden- und Anbieterlisten gibt es direkte Aktionen zum Bearbeiten und Lösch
 
 ## Anfragen vor der Bestätigung
 Website-Anfragen erhalten automatisch den Status `Neu` und erscheinen im Bereich Anfragen. Auch `Kontaktiert`, `Gespräch` und `Abgelehnt` bleiben dort filterbar. Nur `Partner` erscheint unter Kursanbieter. Der Button Bestätigen setzt diesen Status dauerhaft. Unbestätigte Unternehmen können im Editor noch nicht den Status Partner wählen; dafür gibt es die ausdrückliche Bestätigung. Freigaben sind nur für Mitarbeiter möglich, öffentliche Formulare dürfen die Statusspalte nicht setzen. Es werden keine E-Mails versendet und keine Kurse automatisch veröffentlicht.
+
+Kursanbieter können im öffentlichen Formular optional `website_url` als vollständigen HTTP-/HTTPS-Link angeben. Das Feld ist nicht erforderlich. Der Link wird in den Anfragedetails angezeigt und kann im CRM bearbeitet werden. Die Angabe bestätigt den Anbieter nicht automatisch.

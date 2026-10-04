@@ -55,6 +55,8 @@ def create_app(config=None):
         ''')
         if 'archived_at' not in [r[1] for r in db().execute('PRAGMA table_info(contacts)')]:
             db().execute('ALTER TABLE contacts ADD COLUMN archived_at TEXT')
+        if 'website_url' not in [r[1] for r in db().execute('PRAGMA table_info(contacts)')]:
+            db().execute("ALTER TABLE contacts ADD COLUMN website_url TEXT NOT NULL DEFAULT ''")
         db().commit()
 
     def throttle(bucket, limit, window):
@@ -136,7 +138,16 @@ def create_app(config=None):
         kind = data.get('kind')
         if kind not in STATUSES:
             abort(400, description='Ungültiger Kontakttyp.')
-        result = {k: text(data, k, 4000 if k == 'message' else 500, k in ('name', 'email')) for k in ['name', 'email', 'phone', 'company', 'interest', 'channel', 'offer_type', 'message']}
+        result = {k: text(data, k, 4000 if k == 'message' else 2048 if k == 'website_url' else 500, k in ('name', 'email')) for k in ['name', 'email', 'phone', 'company', 'interest', 'channel', 'offer_type', 'message', 'website_url']}
+        if result['website_url']:
+            from urllib.parse import urlsplit
+            try:
+                url = urlsplit(result['website_url'])
+                valid = url.scheme in ('http','https') and url.hostname and not url.username and not url.password and not re.search(r'\s',result['website_url'])
+            except ValueError:
+                valid = False
+            if not valid:
+                abort(400, description='Bitte einen vollständigen Website-Link mit https:// oder http:// angeben.')
         result['email'] = result['email'].lower()
         if not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', result['email']):
             abort(400, description='Bitte gültige E-Mail eingeben.')
@@ -303,7 +314,7 @@ def create_app(config=None):
             reader = csv.DictReader(io.StringIO(content), dialect=dialect)
         except csv.Error:
             abort(400, description='CSV konnte nicht gelesen werden.')
-        mapping = {'name': ['name','Name','contact'], 'email': ['email','Email','E-Mail'], 'phone': ['phone','Phone','Telefon'], 'company': ['company','Unternehmen'], 'interest': ['interest','Interest','category'], 'channel': ['channel','ContactChannel'], 'offer_type': ['offer_type'], 'message': ['message']}
+        mapping = {'name': ['name','Name','contact'], 'email': ['email','Email','E-Mail'], 'phone': ['phone','Phone','Telefon'], 'company': ['company','Unternehmen'], 'interest': ['interest','Interest','category'], 'channel': ['channel','ContactChannel'], 'offer_type': ['offer_type'], 'message': ['message'], 'website_url':['website_url']}
         rows = list(reader)
         if not rows or len(rows) > 5000:
             abort(400, description='Bitte 1 bis 5000 Zeilen importieren.')

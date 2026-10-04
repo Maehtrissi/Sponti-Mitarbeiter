@@ -1,4 +1,4 @@
-export type CRMContact = {id:string;kind:'customer'|'provider';name:string;email:string;phone:string;company:string;interest:string;channel:string;offer_type:string;status:string;message:string;source:string;created_at:string;archived_at?:string|null};
+export type CRMContact = {id:string;kind:'customer'|'provider';name:string;email:string;phone:string;company:string;interest:string;channel:string;offer_type:string;status:string;message:string;source:string;created_at:string;archived_at?:string|null;website_url?:string};
 export const categories = ['Yoga & Wellness','Kochen & Genießen','Kunst & Handwerk','Fotografie & Design','Tanz & Bewegung','Natur & Draußen','Etwas anderes'];
 export function contactReference(id:string) {
   const [kind,value,...extra] = id.split(':');
@@ -13,7 +13,7 @@ export function mapCustomer(row:Record<string,unknown>):CRMContact {
 }
 export function mapProvider(row:Record<string,unknown>):CRMContact {
   const s=(key:string)=>String(row[key]??'');
-  return {id:`provider:${row.id}`,kind:'provider',name:s('contact'),email:s('email'),phone:s('phone'),company:s('company'),interest:s('category'),channel:'',offer_type:s('offer_type'),status:s('crm_status')||'Neu',message:s('message'),source:s('crm_source')||'Website',created_at:s('created_at'),archived_at:s('archived_at')||null};
+  return {id:`provider:${row.id}`,kind:'provider',name:s('contact'),email:s('email'),phone:s('phone'),company:s('company'),website_url:s('website_url'),interest:s('category'),channel:'',offer_type:s('offer_type'),status:s('crm_status')||'Neu',message:s('message'),source:s('crm_source')||'Website',created_at:s('created_at'),archived_at:s('archived_at')||null};
 }
 export function contactPayload(contact:CRMContact, creating=false):Record<string,string|null> {
   if(!contact.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email.trim())) throw new Error('Bitte Name und gültige E-Mail angeben.');
@@ -24,7 +24,13 @@ export function contactPayload(contact:CRMContact, creating=false):Record<string
     return {...common,Name:contact.name.trim(),Email:contact.email.trim(),Phone:contact.phone.trim(),Interest:contact.interest.trim(),ContactChannel:contact.channel||null,crm_message:contact.message.trim()};
   }
   if(!contact.company.trim() || contact.company.length>200 || !categories.includes(contact.interest) || !['Einzelne Kurse','Mehrere Kurse','Beides'].includes(contact.offer_type)) throw new Error('Bitte Unternehmen, Kategorie und Kursangebot auswählen.');
-  return {...common,company:contact.company.trim(),contact:contact.name.trim(),email:contact.email.trim(),phone:contact.phone.trim(),category:contact.interest,offer_type:contact.offer_type,message:contact.message.trim()};
+  const website=contact.website_url?.trim()||'';
+  if(website) {
+    let url:URL;
+    try {url=new URL(website);} catch {throw new Error('Bitte einen vollständigen Website-Link angeben.');}
+    if(website.length>2048 || !['https:','http:'].includes(url.protocol) || !url.hostname || url.username || url.password) throw new Error('Bitte einen Website-Link mit https:// oder http:// angeben.');
+  }
+  return {...common,website_url:website,company:contact.company.trim(),contact:contact.name.trim(),email:contact.email.trim(),phone:contact.phone.trim(),category:contact.interest,offer_type:contact.offer_type,message:contact.message.trim()};
 }
 
 export function isApprovedProvider(contact:CRMContact) {

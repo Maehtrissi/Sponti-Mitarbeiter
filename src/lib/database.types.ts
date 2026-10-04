@@ -178,6 +178,7 @@ export type Database = {
           message: string
           offer_type: string | null
           phone: string
+          website_url: string
         }
         Insert: {
           archived_at?: string | null
@@ -192,6 +193,7 @@ export type Database = {
           message?: string
           offer_type?: string | null
           phone?: string
+          website_url?: string
         }
         Update: {
           archived_at?: string | null
@@ -206,6 +208,7 @@ export type Database = {
           message?: string
           offer_type?: string | null
           phone?: string
+          website_url?: string
         }
         Relationships: []
       }
