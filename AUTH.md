@@ -19,3 +19,5 @@ Supabase RLS mit einer Mitarbeiterberechtigungsprüfung geschützt werden.
 
 Prüfung: `node --experimental-strip-types --test src/lib/employeeAccess.test.ts`
 Build: `npm ci && npm run build`
+
+Das aktive CRM ersetzt die früheren Beispieldaten. Für Datenzugriffe ist zusätzlich ein aktiver Eintrag in `crm_employees` erforderlich. Details und Sperrung siehe `CRM.md`.

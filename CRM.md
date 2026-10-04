@@ -1,4 +1,47 @@
-# Sponti CRM mit eigener Datenbank
+# Sponti CRM
+
+## Aktiver Betrieb: Supabase + GitHub Pages
+
+Die Mitarbeiterseite unter https://sponti-switzerland.ch/Sponti-Mitarbeiter/ verwendet
+Supabase Auth und die bestehenden Tabellen `Kunden - Users` und `Kursanbieter`.
+Die Website-Formulare schreiben weiterhin in diese Tabellen. Das CRM liest daher
+bestehende und neue Kontakte direkt. Es werden keine Daten migriert oder dupliziert.
+
+Kontakte lassen sich suchen, filtern, hinzufügen und bearbeiten. Telefonnummer,
+Interessen, Kontaktkanal und Kursarten werden erhalten. `crm_status`, `crm_message`
+und `crm_source` ergänzen die Kundentabelle; Anbieter erhalten Status, Quelle und
+Telefon. `crm_notes` enthält Notizen und `crm_tasks` Aufgaben. Kein simulierter
+Nachrichtenversand und keine Veröffentlichung von Kursen aus diesem CRM.
+
+Zugriff erfordert sowohl `app_metadata.sponti_employee = true` als auch einen aktiven
+Eintrag in `crm_employees`. Die Freigaben werden nur administrativ gesetzt. Der
+bestehende Zugang `info.sponti@gmail.com` wurde übernommen. Anonyme Besucher dürfen
+Formulare absenden, aber keine Kundendaten lesen oder bearbeiten. Die neue Oberfläche
+verwendet den öffentlichen Publishable-Key; RLS schützt sämtliche Datenzugriffe.
+
+Um einen Mitarbeiter sofort für Datenzugriffe zu sperren, administrativ in
+`crm_employees` `active=false` setzen. Zusätzlich Auth-Sitzungen beenden bzw. das
+App-Metadatum entfernen. Die Registry-Prüfung greift auch bei noch gültigen JWTs.
+Für neue Mitarbeiter: Auth-Benutzer anlegen, das App-Metadatum administrativ setzen
+und dessen Benutzer-ID in `crm_employees` mit `active=true` eintragen.
+
+Der Bereich „Datenexport“ lädt Kunden, Anbieter, Notizen und Aufgaben als JSON herunter.
+Diese Datei enthält persönliche Daten und muss sicher aufbewahrt werden. Die Datei
+ist kein vollständiges Datenbankbackup. Regelmässige Datenbanksicherungen durchführen;
+automatische Backups erfordern einen passenden Supabase-Tarif. Der Tarif wurde nicht
+geändert. Der Schutz vor bekannten kompromittierten Passwörtern ist im bestehenden
+Projekt nicht aktiviert und im Free-Tarif nicht enthalten:
+https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+
+Deployment: `npm run build` erstellt die aktive Supabase-Version für Pages. Die
+GitHub-Aktion prüft Mapping, Mitarbeiterfreigabe, TypeScript und beide Betriebsarten.
+`supabase/tests/crm_permissions.sql` prüft Rollenrechte und Speicherung mit Testdaten
+in einer Transaktion und rollt diese vollständig zurück. Die Tests brauchen einen
+administrativen SQL-Zugang. Die Migrationen dokumentieren die Datenbankänderungen.
+
+## Option für einen späteren eigenen Server
+
+
 
 Die Mitarbeiterseite erhält eine zweite Betriebsart mit eigener SQLite-Datenbank,
 eigenständiger Mitarbeiteranmeldung und einer Flask-API. In diesem Modus wird

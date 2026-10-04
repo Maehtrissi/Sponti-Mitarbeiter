@@ -4,7 +4,7 @@ import { supabase } from './lib/supabase';
 import { hasEmployeeAccess } from './lib/employeeAccess';
 import './auth.css';
 
-const Dashboard = lazy(() => import('./App'));
+const Dashboard = lazy(() => import('./SupabaseCRM'));
 
 export default function AuthGate() {
   const [user, setUser] = useState<User | null>(null);
@@ -22,7 +22,12 @@ export default function AuthGate() {
       try {
         const { data, error: authError } = await supabase.auth.getUser();
         if (!active || current !== version) return;
-        const allowed = !authError && hasEmployeeAccess(data.user);
+        let allowed = !authError && hasEmployeeAccess(data.user);
+        if (allowed) {
+          const access = await supabase.rpc('crm_is_employee');
+          if (!active || current !== version) return;
+          allowed = !access.error && access.data === true;
+        }
         setUser(allowed ? data.user : null);
         if (!authError && data.user && !allowed) {
           setError('Dein Konto ist noch nicht für den Mitarbeiterbereich freigeschaltet.');
@@ -44,7 +49,6 @@ export default function AuthGate() {
         setChecking(false);
       } else {
         // Keep Auth callbacks synchronous to avoid a lock in the Auth client.
-        setChecking(true);
         setTimeout(() => { if (active) void verify(); }, 0);
       }
     });
@@ -73,20 +77,6 @@ export default function AuthGate() {
     }
   };
 
-  const signOut = async () => {
-    if (busy) return;
-    setBusy(true);
-    // Unmount the dashboard immediately, including any unsaved demo data.
-    setUser(null);
-    try {
-      const { error: authError } = await supabase.auth.signOut({ scope: 'local' });
-      if (authError) setError('Die Abmeldung konnte nicht abgeschlossen werden. Bitte erneut abmelden.');
-    } catch {
-      setError('Die Abmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen.');
-    } finally {
-      setBusy(false);
-    }
-  };
 
   if (checking) return <div className="auth-page" role="status">Anmeldung wird geprüft …</div>;
   if (user) return (
@@ -94,10 +84,7 @@ export default function AuthGate() {
       <Suspense fallback={<div className="auth-page" role="status">Dashboard wird geladen …</div>}>
         <Dashboard />
       </Suspense>
-      <div className="auth-account">
-        <span>{user.email}</span>
-        <button onClick={signOut} disabled={busy}>Abmelden</button>
-      </div>
+
     </>
   );
   return (
