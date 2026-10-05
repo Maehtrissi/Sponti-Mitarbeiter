@@ -95,7 +95,7 @@ export default function IndependentCRM({request=serverApi,storageLabel='Eigene D
   const pendingRequests=requests.filter(c=>c.status!=='Abgelehnt');
   const openTasks=tasks.filter(t=>!t.done);
   const kind = tab==='Kursanbieter'||tab==='Anfragen'?'provider':'customer';
-  const visible=contacts.filter(c=>(tab==='Archiv'?!!c.archived_at:tab==='Kursanbieter'?isApprovedProvider(c):tab==='Anfragen'?isProviderRequest(c):c.kind===kind&&!c.archived_at) && (!filter || c.status===filter || c.channel===filter) && `${c.name} ${c.company} ${c.email} ${c.phone} ${c.interest} ${c.location||''}`.toLowerCase().includes(query.toLowerCase()));
+  const visible=contacts.filter(c=>(tab==='Archiv'?!!c.archived_at:tab==='Kursanbieter'?isApprovedProvider(c):tab==='Anfragen'?isProviderRequest(c):c.kind===kind&&!c.archived_at) && (!filter || c.status===filter || c.channel===filter || (c.channel==='Beides' && (filter==='WhatsApp' || filter==='E-Mail'))) && `${c.name} ${c.company} ${c.email} ${c.phone} ${c.interest} ${c.location||''}`.toLowerCase().includes(query.toLowerCase()));
   async function saveContact(e:FormEvent) {
     e.preventDefault(); if(!editor) return;
     await perform(async()=> {
