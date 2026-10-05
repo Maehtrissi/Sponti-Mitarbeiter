@@ -171,3 +171,9 @@ Kursanbieter können im öffentlichen Formular optional eine Telefonnummer (`pho
 Im Supabase-CRM enthält „Kurse“ eigene Kurse mit Titel, Beschreibung, Kategorie, Region, Treffpunkt, Termin, Preis in CHF, freien Plätzen und optionalem Buchungslink. Neue Kurse starten als Entwurf; die Zuordnung zu einem bestätigten Anbieter ist optional. Veröffentlichen und Zurück zu Entwurf steuern die öffentliche Sichtbarkeit. Vergangene Termine, ausgebuchte und archivierte Kurse erscheinen öffentlich nicht. Löschen archiviert; Wiederherstellen macht den Kurs wieder zum Entwurf. Der JSON-Export umfasst auch Kurse.
 
 Die öffentliche Seite liest nur öffentliche Kursfelder über RLS und enthält keine Beispielkurse mehr. Die Kursverwaltung ist Teil des aktiven Supabase-Modus. Der alternative SQLite-Modus bleibt für Kontakte, Notizen und Aufgaben bestehen.
+
+## Kundenprofile
+
+Kund:innen bearbeiten auf der öffentlichen Website Name, Telefon, Interessen und Kontaktkanäle in ihrem eigenen CRM-Eintrag. member_user_id verknüpft den bestätigten Auth-Benutzer. ContactChannel=NULL bedeutet keine Kursinfos/keine Einwilligung und muss bei der Kontaktauswahl berücksichtigt werden. Mitarbeiterstatus, CRM-Notizen und Archivstatus können Kunden nicht verändern.
+
+Die öffentliche Website dokumentiert die erforderliche SMTP- und Redirect-Konfiguration in ACCOUNT.md. Tabellenzugriffe bleiben Mitarbeiterzugriff; eine schmale private Funktion stellt die eigene Profil-RPC bereit.

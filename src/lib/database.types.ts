@@ -192,6 +192,7 @@ export type Database = {
           Email: string | null
           id: number
           Interest: string | null
+          member_user_id: string | null
           Name: string | null
           Phone: string | null
         }
@@ -205,6 +206,7 @@ export type Database = {
           Email?: string | null
           id?: number
           Interest?: string | null
+          member_user_id?: string | null
           Name?: string | null
           Phone?: string | null
         }
@@ -218,6 +220,7 @@ export type Database = {
           Email?: string | null
           id?: number
           Interest?: string | null
+          member_user_id?: string | null
           Name?: string | null
           Phone?: string | null
         }
@@ -277,6 +280,7 @@ export type Database = {
     }
     Functions: {
       crm_is_employee: { Args: never; Returns: boolean }
+      customer_profile: { Args: { profile?: Json }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
