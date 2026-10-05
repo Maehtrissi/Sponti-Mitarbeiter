@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          course_id: string | null
+          course_title: string
+          created_at: string
+          id: string
+          price: number
+          quantity: number
+          starts_at: string
+          status: string
+          user_id: string
+          venue: string
+        }
+        Insert: {
+          course_id?: string | null
+          course_title: string
+          created_at?: string
+          id?: string
+          price?: number
+          quantity?: number
+          starts_at: string
+          status?: string
+          user_id: string
+          venue?: string
+        }
+        Update: {
+          course_id?: string | null
+          course_title?: string
+          created_at?: string
+          id?: string
+          price?: number
+          quantity?: number
+          starts_at?: string
+          status?: string
+          user_id?: string
+          venue?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           archived_at: string | null
@@ -181,6 +228,36 @@ export type Database = {
           },
         ]
       }
+      customer_preferences: {
+        Row: {
+          categories: string[]
+          locality: string
+          preferred_days: string[]
+          preferred_times: string[]
+          radius_km: number | null
+          region: string
+          user_id: string
+        }
+        Insert: {
+          categories?: string[]
+          locality?: string
+          preferred_days?: string[]
+          preferred_times?: string[]
+          radius_km?: number | null
+          region?: string
+          user_id: string
+        }
+        Update: {
+          categories?: string[]
+          locality?: string
+          preferred_days?: string[]
+          preferred_times?: string[]
+          radius_km?: number | null
+          region?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       "Kunden - Users": {
         Row: {
           archived_at: string | null
@@ -281,6 +358,7 @@ export type Database = {
     Functions: {
       crm_is_employee: { Args: never; Returns: boolean }
       customer_profile: { Args: { profile?: Json }; Returns: Json }
+      save_course_preferences: { Args: { settings: Json }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
@@ -413,4 +491,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
