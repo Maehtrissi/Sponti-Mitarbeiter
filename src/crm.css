@@ -3,3 +3,5 @@
 .crm .row-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.crm .row-actions button{font-size:12px;padding:8px 12px}.crm .danger{background:#fbe9e4;color:#9a3b26}.crm .danger:hover{background:#f4d3c9}
 
 .crm .course-fields{border:0;margin:0;padding:0;min-width:0}.crm .courses-crm a{color:#244e3c;text-decoration:underline}
+
+.crm .provider-courses{padding:0 0 22px;margin-bottom:22px;border-bottom:1px solid #e4eadc}.crm .provider-courses ul{list-style:none;padding:0;margin:0 0 18px}.crm .provider-courses li{background:#f6f8f3;border-radius:10px;padding:12px 14px;margin:8px 0}.crm .provider-courses small{display:block;color:#788573;margin-top:4px}.crm .courses-crm .toolbar{flex-wrap:wrap}.crm .courses-crm .toolbar>input{flex:1 1 240px}.crm .courses-crm .toolbar>select{flex:1 1 190px;max-width:280px}

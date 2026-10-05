@@ -314,6 +314,7 @@ export type Database = {
           crm_status: string
           email: string
           id: string
+          location: string
           message: string
           offer_type: string | null
           phone: string
@@ -329,6 +330,7 @@ export type Database = {
           crm_status?: string
           email: string
           id?: string
+          location?: string
           message?: string
           offer_type?: string | null
           phone?: string
@@ -344,6 +346,7 @@ export type Database = {
           crm_status?: string
           email?: string
           id?: string
+          location?: string
           message?: string
           offer_type?: string | null
           phone?: string

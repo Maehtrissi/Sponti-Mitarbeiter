@@ -53,6 +53,17 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     const {data,error}=result;check(error);
     return {id:`${contact.kind}:${data!.id}`} as T;
   }
+  const providerCoursesMatch=path.match(/^contacts\/([^/]+)\/courses$/);
+  if(providerCoursesMatch&&method==='GET'){
+    const reference=contactReference(providerCoursesMatch[1]);
+    if(!reference.provider_id)throw new Error('Nur Anbieter haben zugeordnete Kurse.');
+    const rows=[];
+    for(let offset=0;;offset+=500){
+      const r=await supabase.from('courses').select('id,title,starts_at,venue,status').eq('provider_id',reference.provider_id).is('archived_at',null).order('starts_at').order('id').range(offset,offset+499);
+      check(r.error);rows.push(...(r.data||[]));if(!r.data||r.data.length<500)break;
+    }
+    return rows as T;
+  }
   const approvalMatch=path.match(/^contacts\/([^/]+)\/approve$/);
   if(approvalMatch && method==='POST') {
     const reference=contactReference(approvalMatch[1]);

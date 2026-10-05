@@ -50,3 +50,9 @@ test('provider website is optional and accepts only web links',()=>{
   assert.throws(()=>contactPayload({...provider,website_url:'javascript:alert(1)'}));
   assert.throws(()=>contactPayload({...provider,website_url:'https://user:password@example.org'}));
 });
+test('provider locations round-trip, trim and retain legacy compatibility',()=>{
+ const person=mapProvider({id:'0e8ccf9d-1b77-4a42-8c57-f0de53e3cc42',contact:'Tom',company:'Studio',email:'tom@example.org',category:'Yoga & Wellness',offer_type:'Beides',location:'  Bahnhofstrasse 10, 6300 Zug  '});
+ assert.equal(contactPayload(person).location,'Bahnhofstrasse 10, 6300 Zug');
+ assert.equal(contactPayload({...person,location:undefined}).location,'');
+ assert.throws(()=>contactPayload({...person,location:'a'.repeat(301)}));
+});

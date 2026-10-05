@@ -177,3 +177,11 @@ Die öffentliche Seite liest nur öffentliche Kursfelder über RLS und enthält 
 Kund:innen bearbeiten auf der öffentlichen Website Name, Telefon, Interessen und Kontaktkanäle in ihrem eigenen CRM-Eintrag. member_user_id verknüpft den bestätigten Auth-Benutzer. ContactChannel=NULL bedeutet keine Kursinfos/keine Einwilligung und muss bei der Kontaktauswahl berücksichtigt werden. Mitarbeiterstatus, CRM-Notizen und Archivstatus können Kunden nicht verändern.
 
 Die öffentliche Website dokumentiert die erforderliche SMTP- und Redirect-Konfiguration in ACCOUNT.md. Tabellenzugriffe bleiben Mitarbeiterzugriff; eine schmale private Funktion stellt die eigene Profil-RPC bereit.
+
+## Anbieterstandort und Kurszuordnung
+
+Der Standort eines Kursanbieters wird als location (bis 300 Zeichen) gespeichert. Beide öffentlichen Anbieterformulare fragen ihn ab; in der Mitarbeiter-App kann er nachgetragen oder geändert werden und erscheint in Liste, Detailansicht und Kursverwaltung. Bestehende Anbieter bleiben mit leerem Standort gültig.
+
+Im Anbieterprofil zeigt „Zugeordnete Kurse“ die tatsächlich gespeicherten, nicht archivierten Kurse. „Kurs hinzufügen“ öffnet die vollständige Kursmaske mit vorausgewähltem Anbieter. „Bestehenden Kurs zuordnen“ zeigt Kurse ohne Anbieter; die Zuordnung wird vor dem Speichern in der Kursmaske geprüft. Alternativ lässt sich jeder Kurs zunächst ohne Anbieter erfassen und später bearbeiten. Neu zugeordnet werden nur bestätigte aktive Anbieter. Standort des Unternehmens und Treffpunkt des Kurses sind getrennte Angaben.
+
+Migration: supabase/migrations/20261005195819_provider_location.sql. Berechtigungs- und Speicherprüfung: supabase/tests/provider_location.sql (transaktional, Rollback).
