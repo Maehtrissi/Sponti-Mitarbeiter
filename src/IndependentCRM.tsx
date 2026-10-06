@@ -94,6 +94,7 @@ export default function IndependentCRM({request=serverApi,storageLabel='Eigene D
     setFiles(await api<InternalFile[]>('files')); setNotice('Datei hochgeladen.');
   }
   async function downloadInternalFile(file:InternalFile) {
+    if(request!==serverApi){const result=await api<{url:string}>(`files/${file.id}/download`);window.open(result.url,'_blank','noopener,noreferrer');return;}
     const response=await fetch(`/api/files/${file.id}/download`,{credentials:'same-origin'}); if(!response.ok) throw new Error('Datei konnte nicht heruntergeladen werden.');
     const blob=await response.blob(), url=URL.createObjectURL(blob), link=document.createElement('a'); link.href=url; link.download=file.name; link.click(); URL.revokeObjectURL(url);
   }
