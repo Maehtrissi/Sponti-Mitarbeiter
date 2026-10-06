@@ -133,6 +133,11 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     check(error);return {ok:true} as T;
   }
   const fileMatch=path.match(/^files\/([^/]+)$/);
+  const fileDownloadMatch=path.match(/^files\/([^/]+)\/download$/);
+  if(fileDownloadMatch&&method==='GET') {
+    const {data,error}=await supabase.storage.from('provider-documents').createSignedUrl(`internal/${fileDownloadMatch[1]}`,60);check(error);
+    return {url:data!.signedUrl} as T;
+  }
   if(fileMatch&&method==='DELETE') {
     const {error}=await supabase.storage.from('provider-documents').remove([`internal/${fileMatch[1]}`]);check(error);return {ok:true} as T;
   }
