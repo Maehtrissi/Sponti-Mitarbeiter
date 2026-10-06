@@ -1,5 +1,6 @@
 """Sponti CRM: SQLite persistence, employee-only API and public intake."""
 import csv
+import base64
 import hashlib
 import io
 import json
@@ -10,7 +11,7 @@ import sqlite3
 import time
 import uuid
 from pathlib import Path
-from flask import Flask, abort, g, jsonify, request, send_from_directory
+from flask import Flask, abort, g, jsonify, request, send_from_directory, send_file
 from werkzeug.security import check_password_hash, generate_password_hash
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -50,6 +51,7 @@ def create_app(config=None):
         CREATE UNIQUE INDEX IF NOT EXISTS contacts_email_kind ON contacts(email,kind);
         CREATE TABLE IF NOT EXISTS notes(id TEXT PRIMARY KEY, contact_id TEXT NOT NULL REFERENCES contacts(id) ON DELETE CASCADE, body TEXT NOT NULL, author TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')));
         CREATE TABLE IF NOT EXISTS tasks(id TEXT PRIMARY KEY, contact_id TEXT REFERENCES contacts(id) ON DELETE CASCADE, title TEXT NOT NULL, due_date TEXT NOT NULL, done INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')));
+        CREATE TABLE IF NOT EXISTS internal_files(id TEXT PRIMARY KEY, name TEXT NOT NULL, mime_type TEXT NOT NULL, size INTEGER NOT NULL, content BLOB NOT NULL, uploaded_by TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')));
         CREATE TABLE IF NOT EXISTS attempts(bucket TEXT NOT NULL, happened REAL NOT NULL);
         CREATE INDEX IF NOT EXISTS attempts_time ON attempts(happened);
         ''')
@@ -295,6 +297,41 @@ def create_app(config=None):
             abort(400, description='Ungültiger Aufgabenstatus.')
         if db().execute('UPDATE tasks SET done=? WHERE id=?', (int(done), identifier)).rowcount == 0:
             abort(404, description='Aufgabe nicht gefunden.')
+        db().commit()
+        return jsonify(ok=True)
+
+    @app.get('/api/files')
+    def files():
+        return jsonify([dict(r) for r in db().execute('SELECT id,name,mime_type,size,uploaded_by,created_at FROM internal_files ORDER BY created_at DESC,id')])
+
+    @app.post('/api/files')
+    def add_file():
+        data = payload()
+        name = text(data, 'name', 255, True)
+        mime_type = text(data, 'mime_type', 150) or 'application/octet-stream'
+        encoded = text(data, 'content', 2100000, True)
+        try:
+            content = base64.b64decode(encoded, validate=True)
+        except Exception:
+            abort(400, description='Datei konnte nicht gelesen werden.')
+        if not content or len(content) > 1500000:
+            abort(400, description='Die Datei darf höchstens 1,5 MB gross sein.')
+        identifier = str(uuid.uuid4())
+        db().execute('INSERT INTO internal_files(id,name,mime_type,size,content,uploaded_by) VALUES (?,?,?,?,?,?)', (identifier,name,mime_type,len(content),content,g.employee['email']))
+        db().commit()
+        return jsonify(id=identifier), 201
+
+    @app.get('/api/files/<identifier>/download')
+    def download_file(identifier):
+        row = db().execute('SELECT * FROM internal_files WHERE id=?', (identifier,)).fetchone()
+        if not row:
+            abort(404, description='Datei nicht gefunden.')
+        return send_file(io.BytesIO(row['content']), mimetype=row['mime_type'], as_attachment=True, download_name=row['name'], max_age=0)
+
+    @app.delete('/api/files/<identifier>')
+    def delete_file(identifier):
+        if db().execute('DELETE FROM internal_files WHERE id=?', (identifier,)).rowcount == 0:
+            abort(404, description='Datei nicht gefunden.')
         db().commit()
         return jsonify(ok=True)
 
