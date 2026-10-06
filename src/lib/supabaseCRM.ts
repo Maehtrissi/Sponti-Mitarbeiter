@@ -111,6 +111,31 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     const {data,error}=await supabase.from('crm_tasks').update({done:value.done===true}).eq('id',path.split('/')[1]).select('id').single();check(error);
     if(!data) throw new Error('Aufgabe konnte nicht gespeichert werden.');return {ok:true} as T;
   }
+  if(path==='files'&&method==='GET') {
+    const {data,error}=await supabase.storage.from('provider-documents').list('internal',{limit:1000,sortBy:{column:'created_at',order:'desc'}});
+    check(error);
+    return (data||[]).filter(file=>file.name!=='.emptyFolderPlaceholder').map(file=>({
+      id:file.name,
+      name:(file.metadata?.originalName as string)||file.name.replace(/^[^-]+-/,''),
+      mime_type:(file.metadata?.mimetype as string)||'application/octet-stream',
+      size:Number(file.metadata?.size||0),
+      uploaded_by:'Sponti CRM',
+      created_at:file.created_at||file.updated_at||new Date().toISOString()
+    })) as T;
+  }
+  if(path==='files'&&method==='POST') {
+    const name=String(value.name||'Datei'),mime=String(value.mime_type||'application/octet-stream'),encoded=String(value.content||'');
+    const binary=atob(encoded),bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    if(bytes.byteLength>1500000)throw new Error('Die Datei darf höchstens 1,5 MB gross sein.');
+    const safe=name.replace(/[^a-zA-Z0-9._-]+/g,'_').slice(-160),id=`${crypto.randomUUID()}-${safe}`;
+    const {error}=await supabase.storage.from('provider-documents').upload(`internal/${id}`,new Blob([bytes],{type:mime}),{contentType:mime,upsert:false,metadata:{originalName:name}});
+    check(error);return {ok:true} as T;
+  }
+  const fileMatch=path.match(/^files\/([^/]+)$/);
+  if(fileMatch&&method==='DELETE') {
+    const {error}=await supabase.storage.from('provider-documents').remove([`internal/${fileMatch[1]}`]);check(error);return {ok:true} as T;
+  }
   if(path==='export') {
     const [people,notes,tasks,courses]=await Promise.all([contacts(),allRows('crm_notes'),taskList(),allRows('courses')]);
     return {version:2,contacts:people,notes,tasks,courses} as T;
