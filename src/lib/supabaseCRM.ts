@@ -64,7 +64,7 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     }
     return rows as T;
   }
-  const inviteMatch=path.match(/^contacts\\/([^/]+)\\/invite$/);
+  const inviteMatch=path.match(/^contacts\/([^/]+)\/invite$/);
   if(inviteMatch && method==='POST') {
     const reference=contactReference(inviteMatch[1]);
     if(!reference.provider_id) throw new Error('Nur Kursanbieter können eingeladen werden.');
