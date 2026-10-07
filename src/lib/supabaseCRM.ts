@@ -64,6 +64,15 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     }
     return rows as T;
   }
+  const inviteMatch=path.match(/^contacts\\/([^/]+)\\/invite$/);
+  if(inviteMatch && method==='POST') {
+    const reference=contactReference(inviteMatch[1]);
+    if(!reference.provider_id) throw new Error('Nur Kursanbieter können eingeladen werden.');
+    const {data,error}=await supabase.functions.invoke('invite-provider',{body:{provider_id:reference.provider_id}});
+    if(error) throw new Error(error.message||'Einladung konnte nicht gesendet werden.');
+    if(data?.error) throw new Error(String(data.error));
+    return data as T;
+  }
   const approvalMatch=path.match(/^contacts\/([^/]+)\/approve$/);
   if(approvalMatch && method==='POST') {
     const reference=contactReference(approvalMatch[1]);
