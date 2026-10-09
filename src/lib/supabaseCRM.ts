@@ -5,6 +5,18 @@ import type {TablesInsert,TablesUpdate} from './database.types';
 import type {CRMRequest} from '../IndependentCRM';
 
 type TaskRow={id:string;customer_id:string|number|null;provider_id:string|null;title:string;due_date:string;done:boolean;created_at:string};
+async function invokeEmail(name:string,body:Record<string,unknown>) {
+  const {data,error}=await supabase.functions.invoke(name,{body});
+  if(error){
+    let detail='';
+    if(error.context instanceof Response){try{const result=await error.context.json();detail=typeof result.error==='string'?result.error:'';}catch{/* Keep transport error. */}}
+    throw new Error(detail||error.message||'E-Mail konnte nicht gesendet werden.');
+  }
+  if(data?.error)throw new Error(String(data.error));
+  if(data?.warning)throw new Error(String(data.warning));
+  if(data?.ok!==true)throw new Error('Der Versand wurde nicht bestätigt. Bitte nicht mehrfach senden.');
+  return data;
+}
 function check(error:{message:string}|null) {if(error) throw new Error(error.message);}
 async function allRows(table:'Kunden - Users'|'Kursanbieter'|'crm_notes'|'crm_tasks'|'courses', order='created_at') {
   const rows:Record<string,unknown>[]=[];
@@ -64,14 +76,12 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     }
     return rows as T;
   }
+  if(path==='email'&&method==='POST')return await invokeEmail('send-sponti-email',value) as T;
   const inviteMatch=path.match(/^contacts\/([^/]+)\/invite$/);
   if(inviteMatch && method==='POST') {
     const reference=contactReference(inviteMatch[1]);
     if(!reference.provider_id) throw new Error('Nur Kursanbieter können eingeladen werden.');
-    const {data,error}=await supabase.functions.invoke('invite-provider',{body:{provider_id:reference.provider_id}});
-    if(error) throw new Error(error.message||'Einladung konnte nicht gesendet werden.');
-    if(data?.error) throw new Error(String(data.error));
-    return data as T;
+    return await invokeEmail('invite-provider',{provider_id:reference.provider_id}) as T;
   }
   const approvalMatch=path.match(/^contacts\/([^/]+)\/approve$/);
   if(approvalMatch && method==='POST') {
@@ -156,3 +166,4 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
   }
   throw new Error('Diese Funktion ist in diesem CRM nicht verfügbar.');
 };
+
