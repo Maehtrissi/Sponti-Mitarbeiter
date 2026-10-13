@@ -54,6 +54,34 @@ class CRMTest(unittest.TestCase):
         self.assertEqual(self.client.post('/api/contacts/'+identifier+'/restore',json={},headers=self.headers).status_code,200)
         self.assertIsNone(self.client.get('/api/contacts').json[0]['archived_at'])
         self.assertEqual(self.client.get(f'/api/contacts/{identifier}/notes').json[0]['body'],'Keep note')
+    def test_permanent_deletion_requires_archive_and_deletes_related_records(self):
+        identifier=self.add()
+        note=self.client.post(f'/api/contacts/{identifier}/notes',json={'body':'Notiz'},headers=self.headers)
+        self.assertEqual(note.status_code,201)
+        task=self.client.post('/api/tasks',json={'title':'Kontaktieren','due_date':'2026-10-20','contact_id':identifier},headers=self.headers)
+        self.assertEqual(task.status_code,201)
+        route=f'/api/contacts/{identifier}/permanent'
+        self.assertEqual(self.client.delete(route,json={},headers=self.headers).status_code,404)
+        self.assertEqual(len(self.client.get('/api/contacts').json),1)
+        self.assertEqual(len(self.client.get('/api/tasks').json),1)
+        self.assertEqual(self.client.delete(f'/api/contacts/{identifier}',json={},headers=self.headers).status_code,200)
+        self.assertEqual(self.client.delete(route,json={},headers=self.origin).status_code,403)
+        self.assertEqual(self.client.delete(route,json={},headers=self.headers).status_code,200)
+        self.assertEqual(self.client.get('/api/contacts').json,[])
+        self.assertEqual(self.client.get('/api/tasks').json,[])
+        with sqlite3.connect(self.path) as db:
+            self.assertEqual(db.execute('select count(*) from notes where contact_id=?',(identifier,)).fetchone()[0],0)
+        self.assertEqual(self.client.delete(route,json={},headers=self.headers).status_code,404)
+
+    def test_permanent_deletion_of_archived_provider(self):
+        provider={'kind':'provider','company':'Teststudio','name':'Max Muster','email':'teststudio@example.org','phone':'','offer_type':'Beides','interest':'Yoga & Wellness'}
+        result=self.client.post('/api/contacts',json=provider,headers=self.headers)
+        self.assertEqual(result.status_code,201)
+        identifier=result.json['id']
+        self.assertEqual(self.client.delete(f'/api/contacts/{identifier}',json={},headers=self.headers).status_code,200)
+        self.assertEqual(self.client.delete(f'/api/contacts/{identifier}/permanent',json={},headers=self.headers).status_code,200)
+        self.assertEqual(self.client.get('/api/contacts').json,[])
+
     def test_import_validation_atomicity_and_duplicates(self):
         invalid='Name,Email,Phone,Interest,ContactChannel\nA,a@example.org,123,Kochen,Beides\nB,invalid,123,Tanzen,E-Mail\n'
         r=self.client.post('/api/import',json={'kind':'customer','csv':invalid},headers=self.headers)

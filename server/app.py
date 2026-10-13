@@ -256,6 +256,20 @@ def create_app(config=None):
         db().commit()
         return jsonify(ok=True)
 
+    @app.delete('/api/contacts/<identifier>/permanent')
+    def permanently_delete_contact(identifier):
+        # Only archived records can be permanently removed. Related CRM notes
+        # and tasks are deleted by existing SQLite ON DELETE CASCADE constraints.
+        result = db().execute(
+            'DELETE FROM contacts WHERE id=? AND archived_at IS NOT NULL',
+            (identifier,)
+        )
+        if result.rowcount == 0:
+            db().rollback()
+            abort(404, description='Archivierter Kontakt nicht gefunden.')
+        db().commit()
+        return jsonify(ok=True)
+
     @app.get('/api/contacts/<identifier>/notes')
     def notes(identifier):
         require_contact(identifier)

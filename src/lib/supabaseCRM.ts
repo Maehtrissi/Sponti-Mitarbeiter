@@ -90,6 +90,29 @@ export const supabaseCRMRequest:CRMRequest=async<T>(path:string,_csrf='',method=
     const {data,error}=await supabase.from('Kursanbieter').update({crm_status:'Partner'}).eq('id',reference.provider_id).is('archived_at',null).select('id').single();
     check(error);if(!data) throw new Error('Anfrage konnte nicht bestätigt werden.');return {ok:true} as T;
   }
+  const permanentDeleteMatch=path.match(/^contacts\/([^/]+)\/permanent$/);
+  if(permanentDeleteMatch && method==='DELETE') {
+    const id=permanentDeleteMatch[1];
+    const reference=contactReference(id);
+    if(reference.provider_id) {
+      const providerId=reference.provider_id;
+      // A provider with courses or document metadata cannot be removed without
+      // leaving associated course records inaccessible or uploaded files orphaned.
+      const [courses,documents]=await Promise.all([
+        supabase.from('courses').select('id').eq('provider_id',providerId).limit(1),
+        supabase.from('crm_provider_documents').select('id').eq('provider_id',providerId).limit(1)
+      ]);
+      check(courses.error);check(documents.error);
+      if(courses.data?.length)throw new Error('Dieser Anbieter hat noch verknüpfte Kurse. Entferne oder ordne sie zuerst neu zu, bevor du ihn endgültig löschst.');
+      if(documents.data?.length)throw new Error('Dieser Anbieter hat noch Dokumente. Entferne sie zuerst im Anbieterprofil, bevor du ihn endgültig löschst.');
+    }
+    const result=reference.customer_id!=null
+      ?await supabase.from('Kunden - Users').delete().eq('id',reference.customer_id).not('archived_at','is',null).select('id').maybeSingle()
+      :await supabase.from('Kursanbieter').delete().eq('id',reference.provider_id!).not('archived_at','is',null).select('id').maybeSingle();
+    check(result.error);
+    if(!result.data)throw new Error('Nur archivierte Kontakte können endgültig gelöscht werden. Prüfe, ob dieser Kontakt bereits entfernt wurde.');
+    return {ok:true} as T;
+  }
   const archiveMatch=path.match(/^contacts\/([^/]+)(\/restore)?$/);
   if(archiveMatch && (method==='DELETE'||(method==='POST'&&archiveMatch[2]))) {
     const id=archiveMatch[1];contactReference(id);
