@@ -55,7 +55,7 @@ export default function NewsCRM(){
       };
       if(!payload.title||payload.title.length>100)throw new Error('Bitte einen Titel mit maximal 100 Zeichen eingeben.');
       if((payload.body||'').length>280)throw new Error('Der Kurztext darf maximal 280 Zeichen lang sein.');
-      if(!Number.isInteger(payload.priority)||payload.priority<0||payload.priority>100)throw new Error('Priorität muss zwischen 0 und 100 liegen.');
+      if(!Number.isInteger(editor.priority)||editor.priority<0||editor.priority>100)throw new Error('Priorität muss zwischen 0 und 100 liegen.');
       const result=editor.id
         ?await supabase.from('homepage_news').update(payload).eq('id',editor.id).select('id').single()
         :await supabase.from('homepage_news').insert(payload).select('id').single();
