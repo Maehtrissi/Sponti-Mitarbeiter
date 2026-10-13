@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      homepage_news: {
+        Row: {
+          id: string
+          title: string
+          body: string
+          label: string
+          link_url: string
+          status: string
+          priority: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          body?: string
+          label?: string
+          link_url?: string
+          status?: string
+          priority?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          body?: string
+          label?: string
+          link_url?: string
+          status?: string
+          priority?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           course_id: string | null
