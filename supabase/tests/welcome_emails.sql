@@ -1,0 +1,34 @@
+begin;
+do $$
+declare c uuid:=gen_random_uuid();p uuid:=gen_random_uuid();e uuid:=gen_random_uuid();old_user uuid:=gen_random_uuid();pid uuid;batch jsonb;lease uuid;
+begin
+ insert into auth.users(id,email,raw_user_meta_data,raw_app_meta_data) values(c,'welcome-customer@example.invalid','{}','{}'),(p,'welcome-provider@example.invalid','{}','{}'),(e,'welcome-staff@example.invalid','{}','{"sponti_employee":true}');
+ insert into public."Kursanbieter"(company,contact,email,category,offer_type,crm_status) values('Welcome test','Test','welcome-provider@example.invalid','Yoga & Wellness','Beides','Neu') returning id into pid;
+ insert into private.provider_accounts(user_id,provider_id) values(p,pid);
+ if exists(select 1 from private.welcome_email_outbox where user_id in(c,p,e)) then raise exception 'Queued before confirmation';end if;
+ update auth.users set email_confirmed_at=now() where id in(c,p,e);
+ if not exists(select 1 from private.welcome_email_outbox where user_id=c and kind='customer') then raise exception 'Customer not queued';end if;
+ if not exists(select 1 from private.welcome_email_outbox where user_id=p and kind='provider') then raise exception 'Provider not queued';end if;
+ if exists(select 1 from private.welcome_email_outbox where user_id=e) then raise exception 'Staff was queued';end if;
+ update auth.users set last_sign_in_at=now(),email_confirmed_at=now() where id in(c,p);
+ if (select count(*) from private.welcome_email_outbox where user_id in(c,p))<>2 then raise exception 'Duplicate';end if;
+ insert into auth.users(id,email,email_confirmed_at,raw_user_meta_data,raw_app_meta_data) values(old_user,'old@example.invalid',now(),'{}','{}');
+ update auth.users set last_sign_in_at=now() where id=old_user;
+ if exists(select 1 from private.welcome_email_outbox where user_id=old_user) then raise exception 'Old account queued';end if;
+ batch:=private.claim_welcome_emails();
+ select lease_id into lease from private.welcome_email_outbox where user_id=c;
+ if lease is null then raise exception 'Claim failed';end if;
+ if private.finish_welcome_email(c,gen_random_uuid(),'sent','test',null) then raise exception 'Stale lease accepted';end if;
+ if not private.finish_welcome_email(c,lease,'sent','test',null) then raise exception 'Finish failed';end if;
+ if (select status from private.welcome_email_outbox where user_id=c)<>'sent' then raise exception 'Missing sent status';end if;
+ select lease_id into lease from private.welcome_email_outbox where user_id=p;
+ perform private.finish_welcome_email(p,lease,'pending',null,'test retry');
+ if not exists(select 1 from private.welcome_email_outbox where user_id=p and next_attempt_at>now()) then raise exception 'Missing retry delay';end if;
+ update private.welcome_email_outbox set first_attempt_at=now()-interval '21 hours',next_attempt_at=now() where user_id=p;
+ perform private.claim_welcome_emails();
+ if (select status from private.welcome_email_outbox where user_id=p)<>'failed' then raise exception 'Expired retry not stopped';end if;
+ if has_function_privilege('anon','public.claim_welcome_emails()','execute') or has_function_privilege('authenticated','public.claim_welcome_emails()','execute') then raise exception 'Queue exposed';end if;
+ if has_table_privilege('authenticated','private.welcome_email_outbox','select') then raise exception 'Outbox exposed';end if;
+ if not has_function_privilege('service_role','public.claim_welcome_emails()','execute') then raise exception 'Worker denied';end if;
+end $$;
+rollback;
