@@ -11,3 +11,12 @@
 
 /* Grouped CRM navigation and internal files */
 .crm .nav-groups{gap:18px}.crm .nav-group{display:grid;gap:5px}.crm .nav-heading{padding:0 10px 4px;color:#9aa695;font-size:9px;font-weight:800;letter-spacing:1.35px}.crm .nav-group button{width:100%}.crm .files-panel .toolbar{align-items:flex-start}.crm .files-panel .toolbar>div{flex:1}.crm .files-panel .toolbar p{margin:4px 0 0}.crm .file-upload-button{display:inline-flex;align-items:center;justify-content:center;margin:0;border-radius:10px;padding:11px 18px;background:#244e3c;color:#fff;font-weight:600;cursor:pointer;white-space:nowrap}.crm .file-upload-button input{display:none}.crm .internal-file-list article{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px 0;border-bottom:1px solid #edf0e8}.crm .internal-file-list article:last-child{border-bottom:0}@media(max-width:650px){.crm .nav-groups{display:flex;gap:10px}.crm .nav-group{display:flex;gap:5px}.crm .nav-heading{display:none}.crm .internal-file-list article{align-items:flex-start;flex-direction:column}.crm .files-panel .toolbar{display:block}.crm .file-upload-button{margin-top:14px}}
+
+.crm-profile-editor{margin:20px 0;padding:18px;border:1px solid #d6e0d7;border-radius:12px}
+.crm-profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.crm-profile-grid label{min-width:0}
+.crm-profile-editor input:not([type=checkbox]),.crm-profile-editor textarea,.crm-profile-editor select{box-sizing:border-box;width:100%}
+.crm-profile-checks{border:0;margin:14px 0;padding:0}
+.crm-profile-checks>div{display:flex;flex-wrap:wrap;gap:10px}
+.crm-profile-checks label{display:inline-flex;align-items:center;gap:5px}
+@media(max-width:650px){.crm-profile-grid{grid-template-columns:1fr}}
