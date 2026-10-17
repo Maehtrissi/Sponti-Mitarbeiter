@@ -440,6 +440,7 @@ export type Database = {
     }
     Functions: {
       crm_is_employee: { Args: never; Returns: boolean }
+      crm_profile_editor: { Args: { p_kind: string; p_contact_id: string; p_changes?: Json | null }; Returns: Json }
       customer_profile: { Args: { profile?: Json }; Returns: Json }
       save_course_preferences: { Args: { settings: Json }; Returns: Json }
     }
