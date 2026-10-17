@@ -39,7 +39,7 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
   supabase.rpc('crm_profile_editor',{p_kind:kind,p_contact_id:id,p_changes:null}).then(({data,error})=>{
    if(!active)return;
    if(error){setError(error.message);return;}
-   const result=data as Result;setData(result);setState({...result.profile,...(result.preferences||{})});
+   const result=data as unknown as Result;setData(result);setState({...result.profile,...(result.preferences||{})});
   }).catch(e=>{if(active)setError(String(e))}).finally(()=>{if(active)setLoading(false)});
   return()=>{active=false};
  },[id,kind]);
@@ -62,7 +62,7 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
    }
    const {data:result,error}=await supabase.rpc('crm_profile_editor',{p_kind:kind,p_contact_id:id,p_changes:payload});
    if(error)throw error;
-   const next=result as Result;setData(next);setState({...next.profile,...(next.preferences||{})});
+   const next=result as unknown as Result;setData(next);setState({...next.profile,...(next.preferences||{})});
    await onSaved();setNotice('Profiländerungen gespeichert.');
   }catch(e){setError(e instanceof Error?e.message:'Speichern fehlgeschlagen');}
   finally{setSaving(false)}
