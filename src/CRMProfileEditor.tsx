@@ -1,5 +1,6 @@
 import {useEffect,useState,type FormEvent} from 'react';
 import {supabase} from './lib/supabase';
+import type {Json} from './lib/database.types';
 
 type Props={contactId:string;kind:'customer'|'provider';onSaved:()=>Promise<void>};
 type Result={linked:boolean;kind:string;profile:Record<string,unknown>;preferences?:Record<string,unknown>};
@@ -60,7 +61,7 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
      else payload[key]=state[key]??[];
     }
    }
-   const {data:result,error}=await supabase.rpc('crm_profile_editor',{p_kind:kind,p_contact_id:id,p_changes:payload});
+   const {data:result,error}=await supabase.rpc('crm_profile_editor',{p_kind:kind,p_contact_id:id,p_changes:payload as Json});
    if(error)throw error;
    const next=result as unknown as Result;setData(next);setState({...next.profile,...(next.preferences||{})});
    await onSaved();setNotice('Profiländerungen gespeichert.');
