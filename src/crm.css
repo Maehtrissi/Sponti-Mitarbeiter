@@ -20,3 +20,6 @@
 .crm-profile-checks>div{display:flex;flex-wrap:wrap;gap:10px}
 .crm-profile-checks label{display:inline-flex;align-items:center;gap:5px}
 @media(max-width:650px){.crm-profile-grid{grid-template-columns:1fr}}
+
+.nav-groups .nav-subitem{padding-left:28px;font-size:.93em;opacity:.9}
+.nav-groups .nav-subitem.active{opacity:1}
