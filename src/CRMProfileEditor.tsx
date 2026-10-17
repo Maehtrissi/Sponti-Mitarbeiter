@@ -54,7 +54,11 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
      for(const key of ['locality','radius_km','categories','regions','preferred_days','preferred_times'])payload[key]=state[key]??(key==='radius_km'?'':key==='locality'?'':[]);
     }
    }else if(data?.linked){
-    for(const key of ['specialties','social_links'])payload[key]=state[key]??[];
+    for(const key of ['specialties','social_links']){
+     const raw=state['_raw_'+key];
+     if(typeof raw==='string'){const parsed=JSON.parse(raw);if(!Array.isArray(parsed))throw new Error('Angebote und Links müssen Listen sein.');payload[key]=parsed;}
+     else payload[key]=state[key]??[];
+    }
    }
    const {data:result,error}=await supabase.rpc('crm_profile_editor',{p_kind:kind,p_contact_id:id,p_changes:payload});
    if(error)throw error;
