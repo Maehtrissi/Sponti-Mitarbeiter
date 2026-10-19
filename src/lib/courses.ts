@@ -12,5 +12,6 @@ export function coursePayload(input:Record<string,unknown>){
  if(status==='published'&&(date.getTime()<=Date.now()||seats===0))throw new Error('Veröffentlichte Kurse brauchen einen zukünftigen Termin und freie Plätze.');
  const provider_id=String(input.provider_id||'')||null;
  if(provider_id&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(provider_id))throw new Error('Ungültiger Kursanbieter.');
- return {title,description,venue,booking_url,category,region,status,starts_at:date.toISOString(),price:Math.round(price*100)/100,seats,provider_id};
+ const extra={ticket_type:text('ticket_type',200),meeting_point:text('meeting_point',1000),cancellation_policy:text('cancellation_policy',3000),additional_info:text('additional_info',4000),accessibility:text('accessibility',3000),help_info:text('help_info',2000),similar_experiences:text('similar_experiences',2000)};
+ return {title,description,venue,booking_url,category,region,status,starts_at:date.toISOString(),price:Math.round(price*100)/100,seats,provider_id,...extra};
 }
