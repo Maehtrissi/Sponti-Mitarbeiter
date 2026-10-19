@@ -23,3 +23,14 @@
 
 .nav-groups .nav-subitem{padding-left:28px;font-size:.93em;opacity:.9}
 .nav-groups .nav-subitem.active{opacity:1}
+
+/* Independent, combinable CRM filters for customers and course providers. */
+.crm-attribute-filters{margin:14px 0 22px;padding:18px;border:1px solid #d8e3d8;border-radius:15px;background:#f6f9f4}
+.crm-attribute-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.crm-attribute-heading strong{font-size:15px;color:#193b30}
+.crm-attribute-heading button{font-size:12px}
+.crm-attribute-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px}
+.crm-attribute-grid label{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:12px;font-weight:700;color:#395a49}
+.crm-attribute-grid input,.crm-attribute-grid select{width:100%;min-width:0;min-height:40px;border:1px solid #cbd9ce;border-radius:9px;padding:8px 10px;background:white;color:#19342d;box-sizing:border-box;font-size:13px}
+.crm-attribute-filters>small{display:block;margin-top:13px;color:#597566}
+@media(max-width:650px){.crm-attribute-filters{padding:13px}.crm-attribute-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.crm-attribute-heading{align-items:flex-start}.crm-attribute-heading button{white-space:nowrap}}
