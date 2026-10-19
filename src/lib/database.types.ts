@@ -119,6 +119,13 @@ export type Database = {
           status: string
           title: string
           venue: string
+          similar_experiences: string
+          help_info: string
+          accessibility: string
+          additional_info: string
+          cancellation_policy: string
+          meeting_point: string
+          ticket_type: string
         }
         Insert: {
           archived_at?: string | null
@@ -151,6 +158,13 @@ export type Database = {
           status?: string
           title?: string
           venue?: string
+          similar_experiences?: string
+          help_info?: string
+          accessibility?: string
+          additional_info?: string
+          cancellation_policy?: string
+          meeting_point?: string
+          ticket_type?: string
         }
         Relationships: [
           {
