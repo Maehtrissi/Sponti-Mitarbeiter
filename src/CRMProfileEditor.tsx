@@ -25,7 +25,12 @@ const times=[['morning','Vormittag'],['afternoon','Nachmittag'],['evening','Aben
 function string(value:unknown){return typeof value==='string'?value:''}
 function checkboxes(title:string,key:string,options:string[][],state:Record<string,unknown>,setState:(value:Record<string,unknown>)=>void){
  const selected=Array.isArray(state[key])?state[key] as string[]:[];
- return <fieldset className="crm-profile-checks"><legend>{title}</legend><div>{options.map(([value,label])=><label key={value}><input type="checkbox" checked={selected.includes(value)} onChange={e=>setState({...state,[key]:e.target.checked?[...selected,value]:selected.filter(s=>s!==value)})}/>{label}</label>)}</div></fieldset>;
+ const allLabels:Record<string,string>={categories:'Alle möglichen Kurse',regions:'Ganze Schweiz / alle Regionen',preferred_days:'Alle Wochentage',preferred_times:'Alle Tageszeiten'};
+ const allSelected=options.every(([value])=>selected.includes(value)) || (key==='regions'&&selected.includes('schweiz'));
+ return <fieldset className="crm-profile-checks"><legend>{title}</legend><div>
+  <label><input type="checkbox" checked={allSelected} onChange={e=>setState({...state,[key]:e.target.checked?(key==='regions'?['schweiz']:options.map(([value])=>value)):[]})}/><strong>{allLabels[key]||'Alle'}</strong></label>
+  {options.filter(([value])=>!(key==='regions'&&value==='schweiz')).map(([value,label])=><label key={value}><input type="checkbox" checked={selected.includes(value)||(key==='regions'&&selected.includes('schweiz'))} onChange={e=>setState({...state,[key]:e.target.checked?[...selected.filter(s=>s!=='schweiz'),value]:selected.filter(s=>s!==value&&s!=='schweiz')})}/>{label}</label>)}
+ </div></fieldset>;
 }
 export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
  const [data,setData]=useState<Result|null>(null);
