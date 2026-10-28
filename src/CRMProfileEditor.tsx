@@ -15,6 +15,8 @@ const provider:Field[]=[
  {key:'email',label:'Kontakt-E-Mail für Sponti',type:'email'},{key:'phone',label:'Interne Telefonnummer'},{key:'location',label:'Adresse'},
  {key:'postal_code',label:'Postleitzahl'},{key:'city',label:'Ort'},
  {key:'website',label:'Website',type:'url'},{key:'category',label:'Kategorie'},
+ {key:'offer_type',label:'Art des Angebots',type:'select',choices:['','Einzelne Kurse','Mehrere Kurse','Beides']},
+ {key:'message',label:'Nachricht aus der Anmeldung / Anfrage',type:'textarea'},
  {key:'description',label:'Kurzbeschreibung',type:'textarea'},{key:'about_text',label:'Über uns',type:'textarea'},{key:'public_email',label:'Öffentliche E-Mail',type:'email'},
  {key:'public_phone',label:'Öffentliche Telefonnummer'}, {key:'booking_url',label:'Buchungslink',type:'url'},
  {key:'internal_notes',label:'Interne Notizen',type:'textarea'}
@@ -77,7 +79,7 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
   finally{setSaving(false)}
  }
  const field=(f:Field)=> <label key={f.key}>{f.label}
-  {f.type==='textarea'?<textarea rows={3} maxLength={f.key==='about_text'?1000:f.key==='internal_notes'||f.key==='description'?3000:undefined} value={string(state[f.key])} onChange={e=>edit(f.key,e.target.value)} />:
+  {f.type==='textarea'?<textarea rows={3} maxLength={f.key==='about_text'?1000:f.key==='message'?5000:f.key==='internal_notes'||f.key==='description'?3000:undefined} value={string(state[f.key])} onChange={e=>edit(f.key,e.target.value)} />:
   f.type==='select'?<select value={string(state[f.key])} onChange={e=>edit(f.key,e.target.value)}>{f.choices?.map(v=><option key={v} value={v}>{v}</option>)}</select>:
   <input type={f.type||'text'} value={string(state[f.key])} onChange={e=>edit(f.key,e.target.value)} />}
  </label>;
@@ -102,7 +104,8 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
  {title:'Persönliche Angaben',description:'Name und Telefonnummer des Kunden.',keys:['name','phone']},
  {title:'Kursinformationen',description:'Der vom Kunden gewählte Kanal für Kursinfos und Angebote.',keys:['channel']}
 ]:[
- {title:'Allgemeine Informationen',description:'Angaben zum Unternehmen und seinem Standort.',keys:['company','category','location','postal_code','city','contact_name','email','phone']},
+ {title:'Allgemeine Informationen',description:'Angaben zum Unternehmen und seinem Standort.',keys:['company','category','offer_type','location','postal_code','city','contact_name','email','phone']},
+ {title:'Anmeldung & Anfrage',description:'Die ursprüngliche Anfrage des Kursanbieters. Auch ohne verknüpftes Benutzerkonto bearbeitbar.',keys:['message']},
  {title:'Öffentliche Kontaktdaten & Links',description:'Diese Angaben gehören zum öffentlichen Anbieterprofil.',keys:['public_email','public_phone','website','booking_url']},
  {title:'Unternehmen vorstellen',description:'Öffentliche Beschreibung für Interessierte.',keys:['description','about_text']},
  {title:'Interne Informationen',description:'Notizen für die Zusammenarbeit, nicht für das öffentliche Profil.',keys:['internal_notes']}
