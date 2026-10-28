@@ -1,4 +1,5 @@
 import {useEffect,useState,type FormEvent} from 'react';
+import CRMProviderMedia from './CRMProviderMedia';
 import {supabase} from './lib/supabase';
 import type {Json} from './lib/database.types';
 
@@ -11,10 +12,10 @@ const customer:Field[]=[
 ];
 const provider:Field[]=[
  {key:'company',label:'Unternehmen'},{key:'contact_name',label:'Kontaktperson'},
- {key:'phone',label:'Interne Telefonnummer'},{key:'location',label:'Adresse'},
+ {key:'email',label:'Kontakt-E-Mail für Sponti',type:'email'},{key:'phone',label:'Interne Telefonnummer'},{key:'location',label:'Adresse'},
  {key:'postal_code',label:'Postleitzahl'},{key:'city',label:'Ort'},
  {key:'website',label:'Website',type:'url'},{key:'category',label:'Kategorie'},
- {key:'about_text',label:'Über uns',type:'textarea'},{key:'public_email',label:'Öffentliche E-Mail',type:'email'},
+ {key:'description',label:'Kurzbeschreibung',type:'textarea'},{key:'about_text',label:'Über uns',type:'textarea'},{key:'public_email',label:'Öffentliche E-Mail',type:'email'},
  {key:'public_phone',label:'Öffentliche Telefonnummer'}, {key:'booking_url',label:'Buchungslink',type:'url'},
  {key:'internal_notes',label:'Interne Notizen',type:'textarea'}
 ];
@@ -60,11 +61,13 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
      for(const key of ['locality','radius_km','categories','regions','preferred_days','preferred_times'])payload[key]=state[key]??(key==='radius_km'?'':key==='locality'?'':[]);
     }
    }else if(data?.linked){
-    for(const key of ['specialties','social_links']){
-     const raw=state['_raw_'+key];
-     if(typeof raw==='string'){const parsed=JSON.parse(raw);if(!Array.isArray(parsed))throw new Error('Angebote und Links müssen Listen sein.');payload[key]=parsed;}
-     else payload[key]=state[key]??[];
-    }
+    payload.specialties=readList('specialties').filter(x=>x.name?.trim()).map(x=>({...x,name:x.name.trim()}));
+    payload.social_links=readList('social_links').filter(x=>x.label?.trim()||x.url?.trim()).map(x=>{
+     if(!x.label?.trim())throw new Error('Bitte jeden Link beschriften.');
+     let url:URL;try{url=new URL(x.url);}catch{throw new Error('Bitte eine vollständige Webadresse für jeden Link eingeben.');}
+     if(!['https:','http:'].includes(url.protocol)||url.username||url.password)throw new Error('Links müssen mit https:// oder http:// beginnen.');
+     return {...x,label:x.label.trim(),url:url.href};
+    });
    }
    const {data:result,error}=await supabase.rpc('crm_profile_editor',{p_kind:kind,p_contact_id:id,p_changes:payload as Json});
    if(error)throw error;
@@ -74,31 +77,37 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
   finally{setSaving(false)}
  }
  const field=(f:Field)=> <label key={f.key}>{f.label}
-  {f.type==='textarea'?<textarea rows={3} value={string(state[f.key])} onChange={e=>edit(f.key,e.target.value)} />:
+  {f.type==='textarea'?<textarea rows={3} maxLength={f.key==='about_text'?1000:f.key==='internal_notes'||f.key==='description'?3000:undefined} value={string(state[f.key])} onChange={e=>edit(f.key,e.target.value)} />:
   f.type==='select'?<select value={string(state[f.key])} onChange={e=>edit(f.key,e.target.value)}>{f.choices?.map(v=><option key={v} value={v}>{v}</option>)}</select>:
   <input type={f.type||'text'} value={string(state[f.key])} onChange={e=>edit(f.key,e.target.value)} />}
  </label>;
- const jsonField=(key:string,label:string,shape:'array')=><label>{label} (JSON)
-  <textarea rows={4} value={string(state['_raw_'+key])||JSON.stringify(state[key]??[],null,2)} onChange={e=>{
-   edit('_raw_'+key,e.target.value);
-   try{const parsed=JSON.parse(e.target.value);if(Array.isArray(parsed))edit(key,parsed)}catch{/* validation on save */ }
-  }} />
- </label>;
+ const readList=(key:string):Record<string,string>[]=>Array.isArray(state[key])?(state[key] as unknown[]).filter(item=>item!==null&&(typeof item==='object'||typeof item==='string')).map(item=>typeof item==='string'?{name:item}:item as Record<string,string>):[];
+ const listFields=(key:'specialties'|'social_links')=>{
+  const rows=readList(key),isLink=key==='social_links',limit=isLink?20:30;
+  const update=(index:number,field:string,value:string)=>edit(key,rows.map((row,i)=>i===index?{...row,[field]:value}:row));
+  return <fieldset className="profile-field-group"><legend>{isLink?'Links':'Angebote & Kursarten'}</legend><p className="muted">{isLink?'Website und Buchungslink stehen oben. Weitere Links wie Instagram kannst du hier mit eigener Beschriftung hinzufügen.':'Ergänze die Kursarten und Angebote, die im Anbieterprofil vorgestellt werden.'}</p>
+  {rows.map((row,i)=><div className="crm-list-row" key={i}>
+   <label>{isLink?'Link-Beschriftung':'Name des Angebots'}<input required maxLength={150} value={(isLink?row.label:row.name)||''} onChange={e=>update(i,isLink?'label':'name',e.target.value)}/></label>
+   {isLink?<label>Webadresse<input required type="url" maxLength={2048} value={row.url||''} placeholder="https://…" onChange={e=>update(i,'url',e.target.value)}/></label>:<label>Beschreibung (optional)<textarea maxLength={1000} value={row.description||''} onChange={e=>update(i,'description',e.target.value)}/></label>}
+   <div className="row-actions"><button type="button" className="secondary" aria-label={`Eintrag ${i+1} nach oben verschieben`} disabled={i===0} onClick={()=>{const next=[...rows];[next[i-1],next[i]]=[next[i],next[i-1]];edit(key,next);}}>Nach oben</button><button type="button" className="secondary" onClick={()=>edit(key,rows.filter((_,index)=>index!==i))}>Entfernen</button></div>
+  </div>)}
+  <button type="button" className="secondary" disabled={rows.length>=limit} onClick={()=>edit(key,[...rows,isLink?{label:'',url:''}:{name:'',description:''}])}>{isLink?'+ Link hinzufügen':'+ Angebot hinzufügen'}</button><small className="muted"> {rows.length} von {limit}</small></fieldset>;
+ };
  return <section className="crm-profile-editor">
   <h3>Profil vollständig bearbeiten</h3>
   {loading?<p>Profildaten werden geladen …</p>:error&&!data?<p role="alert" className="error">{error}</p>:
-  <form onSubmit={save}>
+  <form onSubmit={save}><fieldset className="crm-profile-all-fields" disabled={saving}>
    {!data?.linked&&<p className="muted">Dieser Kontakt ist noch keinem Benutzerkonto zugeordnet. CRM-Stammdaten können bearbeitet werden; kontogebundene Einstellungen erscheinen nach einer Verknüpfung.</p>}
    {(kind==='customer'?[
  {title:'Persönliche Angaben',description:'Name und Telefonnummer des Kunden.',keys:['name','phone']},
  {title:'Kursinformationen',description:'Der vom Kunden gewählte Kanal für Kursinfos und Angebote.',keys:['channel']}
 ]:[
  {title:'Unternehmen & Standort',description:'Angaben zur Firma und ihrem Standort.',keys:['company','category','location','postal_code','city']},
- {title:'Kontakt für Sponti',description:'Ansprechperson und interne Telefonnummer für eure Zusammenarbeit.',keys:['contact_name','phone']},
+ {title:'Kontakt für Sponti',description:'Ansprechperson und interne Telefonnummer für eure Zusammenarbeit.',keys:['contact_name','email','phone']},
  {title:'Öffentliche Kontaktdaten & Links',description:'Diese Angaben gehören zum öffentlichen Anbieterprofil.',keys:['public_email','public_phone','website','booking_url']},
- {title:'Unternehmen vorstellen',description:'Öffentliche Beschreibung für Interessierte.',keys:['about_text']},
+ {title:'Unternehmen vorstellen',description:'Öffentliche Beschreibung für Interessierte.',keys:['description','about_text']},
  {title:'Interne Informationen',description:'Notizen für die Zusammenarbeit, nicht für das öffentliche Profil.',keys:['internal_notes']}
-]).map(group=>{const fields=(kind==='customer'?customer:provider.filter(f=>data?.linked||!['postal_code','city','about_text','public_email','public_phone','booking_url','internal_notes'].includes(f.key))).filter(f=>group.keys.includes(f.key));return fields.length>0&&<fieldset className="profile-field-group" key={group.title}><legend>{group.title}</legend><p className="muted">{group.description}</p><div className="crm-profile-grid">{fields.map(field)}</div></fieldset>})}
+]).map(group=>{const fields=(kind==='customer'?customer:provider.filter(f=>data?.linked||!['postal_code','city','description','about_text','public_email','public_phone','booking_url','internal_notes'].includes(f.key))).filter(f=>group.keys.includes(f.key));return fields.length>0&&<fieldset className="profile-field-group" key={group.title}><legend>{group.title}</legend><p className="muted">{group.description}</p><div className="crm-profile-grid">{fields.map(field)}</div></fieldset>})}
    {kind==='customer'&&data?.linked&&<>
     <h4>Kursinteressen und gewünschte Regionen</h4>
     <div className="crm-profile-grid"><label>Ausgangsort / PLZ<input value={string(state.locality)} onChange={e=>edit('locality',e.target.value)}/></label><label>Umkreis (km)<select value={state.radius_km==null?'':String(state.radius_km)} onChange={e=>edit('radius_km',e.target.value)}>{['','5','10','20','30','50','100'].map(x=><option value={x} key={x}>{x||'Keine Einschränkung'}</option>)}</select></label></div>
@@ -107,13 +116,11 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
     {checkboxes('Bevorzugte Wochentage','preferred_days',days,state,setState)}
     {checkboxes('Bevorzugte Tageszeiten','preferred_times',times,state,setState)}
    </>}
-   {kind==='provider'&&data?.linked&&<><h4>Angebote und Social Media</h4>
-    {jsonField('specialties','Angebote','array')}
-    {jsonField('social_links','Social-Media-Links','array')}
-    <p className="muted">Logo, Banner und Galerie werden über die bestehende Bildverwaltung des Anbieterkontos verwaltet. Zugangsdaten und Passwörter können hier nicht eingesehen werden.</p>
-   </>}
+   {kind==='provider'&&data?.linked&&<>{listFields('specialties')}{listFields('social_links')}</>}
    {error&&<p className="error" role="alert">{error}</p>}{notice&&<p role="status" className="notice">{notice}</p>}
    <button type="submit" disabled={saving}>{saving?'Speichert …':'Profiländerungen speichern'}</button>
-  </form>}
+  </fieldset></form>}
+  {kind==='provider'&&data&&<CRMProviderMedia key={id} providerId={id}/>}
+
  </section>;
 }
