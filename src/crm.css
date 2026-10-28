@@ -130,3 +130,33 @@
 .crm .dialog>.close{right:16px;top:16px}
 @media(min-width:1200px){.crm .dialog{width:1040px}}
 @media(max-width:700px){.crm .dialog{width:100%;max-width:100%;padding:28px 20px}.crm .dialog dl{grid-template-columns:1fr;gap:0}.crm .dialog .crm-profile-editor{padding:16px}.crm .dialog .crm-profile-grid{grid-template-columns:1fr}}
+
+/* Contact detail information architecture. */
+.crm .dialog [hidden]{display:none!important}
+.crm .dialog>.detail-contact-person{margin:4px 0 18px;color:#718275;font-size:13px}
+.crm .detail-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0;padding:6px;background:#f1f5ed;border:1px solid #e1e9dc;border-radius:13px}
+.crm .detail-tabs button{flex:1;justify-content:center;text-align:center;min-height:39px;padding:9px 13px;white-space:nowrap;background:transparent;color:#657b68;font-size:12px;border-radius:9px;box-shadow:none}
+.crm .detail-tabs button.active{background:white;color:#254b37;box-shadow:0 2px 7px #19342d0b}
+.crm .detail-tabs button:hover{background:#e4eddd;color:#254b37}
+.crm .detail-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.crm .detail-summary-card{border:1px solid #e2e9dd;border-radius:14px;padding:19px 20px;background:#fbfcf8}
+.crm .detail-summary-card:last-child{grid-column:1/-1;background:#f4f7f0}
+.crm .detail-summary-card h3{margin:0 0 13px;font-size:14px;color:#315a40}
+.crm .dialog .detail-summary-card dl{display:block;margin:0}
+.crm .dialog .detail-summary-card dl>div{grid-template-columns:110px minmax(0,1fr);font-size:12px;padding:9px 0}
+.crm .detail-summary-card dl>div:last-child{border:0}
+.crm .detail-summary-card:last-child dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.crm .dialog .detail-summary-card:last-child dl>div{display:block;border:0}
+.crm .detail-summary-card:last-child dd{margin-top:5px;font-weight:600}
+.crm .detail-message{margin:20px 0;padding:18px 20px;border-left:3px solid #dfa879;background:#fdf8f0;border-radius:0 12px 12px 0}
+.crm .detail-message h3{margin:0 0 8px;font-size:13px}
+.crm .detail-message p{white-space:pre-wrap;margin:0;font-size:13px}
+.crm .detail-actions{border-top:1px solid #e5ecdf;padding-top:22px;margin-top:24px}
+.crm .detail-intro{font-size:12px;color:#788b7b;margin:0 0 18px}
+.crm .detail-section .crm-profile-editor{margin-top:0}
+.crm .profile-field-group{border:0;padding:20px 0 0;margin:18px 0 0;border-top:1px solid #e2e9dc;min-width:0}
+.crm .profile-field-group legend{font-size:13px;font-weight:700;padding:0 9px 0 0;color:#315a40}
+.crm .profile-field-group>p{margin:0 0 14px;font-size:12px}
+.crm .profile-field-group label:has(textarea){grid-column:1/-1}
+.crm .detail-section .provider-courses,.crm .detail-section .provider-documents{border-bottom:0;margin-bottom:0;padding-bottom:0}
+@media(max-width:700px){.crm .detail-tabs{gap:4px;margin:20px 0}.crm .detail-tabs button{flex:1 1 40%;font-size:11px;padding:8px}.crm .detail-summary-grid{grid-template-columns:1fr;gap:12px}.crm .detail-summary-card{padding:16px}.crm .detail-summary-card:last-child{grid-column:auto}.crm .detail-summary-card:last-child dl{grid-template-columns:1fr;gap:0}.crm .dialog .detail-summary-card:last-child dl>div{display:grid;grid-template-columns:110px minmax(0,1fr)}.crm .detail-summary-card:last-child dd{margin:0}}

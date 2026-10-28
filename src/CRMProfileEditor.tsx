@@ -89,7 +89,16 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
   {loading?<p>Profildaten werden geladen …</p>:error&&!data?<p role="alert" className="error">{error}</p>:
   <form onSubmit={save}>
    {!data?.linked&&<p className="muted">Dieser Kontakt ist noch keinem Benutzerkonto zugeordnet. CRM-Stammdaten können bearbeitet werden; kontogebundene Einstellungen erscheinen nach einer Verknüpfung.</p>}
-   <div className="crm-profile-grid">{(kind==='customer'?customer:provider.filter(f=>data?.linked||!['postal_code','city','about_text','public_email','public_phone','booking_url','internal_notes'].includes(f.key))).map(field)}</div>
+   {(kind==='customer'?[
+ {title:'Persönliche Angaben',description:'Name und Telefonnummer des Kunden.',keys:['name','phone']},
+ {title:'Kursinformationen',description:'Der vom Kunden gewählte Kanal für Kursinfos und Angebote.',keys:['channel']}
+]:[
+ {title:'Unternehmen & Standort',description:'Angaben zur Firma und ihrem Standort.',keys:['company','category','location','postal_code','city']},
+ {title:'Kontakt für Sponti',description:'Ansprechperson und interne Telefonnummer für eure Zusammenarbeit.',keys:['contact_name','phone']},
+ {title:'Öffentliche Kontaktdaten & Links',description:'Diese Angaben gehören zum öffentlichen Anbieterprofil.',keys:['public_email','public_phone','website','booking_url']},
+ {title:'Unternehmen vorstellen',description:'Öffentliche Beschreibung für Interessierte.',keys:['about_text']},
+ {title:'Interne Informationen',description:'Notizen für die Zusammenarbeit, nicht für das öffentliche Profil.',keys:['internal_notes']}
+]).map(group=>{const fields=(kind==='customer'?customer:provider.filter(f=>data?.linked||!['postal_code','city','about_text','public_email','public_phone','booking_url','internal_notes'].includes(f.key))).filter(f=>group.keys.includes(f.key));return fields.length>0&&<fieldset className="profile-field-group" key={group.title}><legend>{group.title}</legend><p className="muted">{group.description}</p><div className="crm-profile-grid">{fields.map(field)}</div></fieldset>})}
    {kind==='customer'&&data?.linked&&<>
     <h4>Kursinteressen und gewünschte Regionen</h4>
     <div className="crm-profile-grid"><label>Ausgangsort / PLZ<input value={string(state.locality)} onChange={e=>edit('locality',e.target.value)}/></label><label>Umkreis (km)<select value={state.radius_km==null?'':String(state.radius_km)} onChange={e=>edit('radius_km',e.target.value)}>{['','5','10','20','30','50','100'].map(x=><option value={x} key={x}>{x||'Keine Einschränkung'}</option>)}</select></label></div>
