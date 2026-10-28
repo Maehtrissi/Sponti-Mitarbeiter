@@ -160,3 +160,21 @@
 .crm .profile-field-group label:has(textarea){grid-column:1/-1}
 .crm .detail-section .provider-courses,.crm .detail-section .provider-documents{border-bottom:0;margin-bottom:0;padding-bottom:0}
 @media(max-width:700px){.crm .detail-tabs{gap:4px;margin:20px 0}.crm .detail-tabs button{flex:1 1 40%;font-size:11px;padding:8px}.crm .detail-summary-grid{grid-template-columns:1fr;gap:12px}.crm .detail-summary-card{padding:16px}.crm .detail-summary-card:last-child{grid-column:auto}.crm .detail-summary-card:last-child dl{grid-template-columns:1fr;gap:0}.crm .dialog .detail-summary-card:last-child dl>div{display:grid;grid-template-columns:110px minmax(0,1fr)}.crm .detail-summary-card:last-child dd{margin:0}}
+
+/* Provider document metadata, without file uploads */
+.document-register-form{margin-top:24px}
+.register-fields,.register-data{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.register-fields label{display:flex;flex-direction:column;gap:8px;min-width:0}
+.register-fields input,.register-fields select,.register-fields textarea{width:100%;box-sizing:border-box}
+.register-fields small{font-weight:400;line-height:1.5;color:#687b72}
+.register-wide{grid-column:1/-1}
+.document-register-list{display:grid;gap:18px;margin-top:24px}
+.document-register-card{padding:24px;border:1px solid #dce5dc;border-radius:18px;background:#fcfdf9}
+.register-card-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.register-card-heading h4{margin:6px 0 18px;font-size:19px}
+.register-card-heading small{color:#687b72}
+.detail-dialog .register-data{margin:0 0 20px}
+.detail-dialog .register-data>div{display:block;border:0;padding:8px 0}
+.register-data dt{font-size:12px;color:#687b72;margin-bottom:6px}
+.register-data dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:640px){.register-fields,.register-data{grid-template-columns:1fr}.register-card-heading{align-items:flex-start}.document-register-card{padding:18px}}

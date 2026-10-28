@@ -2,40 +2,42 @@ import {useEffect,useState,type FormEvent} from 'react';
 import {supabase} from './lib/supabase';
 import type {Tables} from './lib/database.types';
 
-type DocumentRow=Tables<'crm_provider_documents'>;
-const types=['Angebot','Anbietervereinbarung','Versicherungsnachweis','Bewilligung / Zertifikat','Sonstiges'];
-const fmt=(bytes:number)=>bytes<1024*1024?`${Math.max(1,Math.round(bytes/1024))} KB`:`${(bytes/1024/1024).toFixed(1)} MB`;
+type Entry=Tables<'crm_provider_document_register'>;
+const types=['Anbietervereinbarung','Angebot','Versicherungsnachweis','Bewilligung / Zertifikat','Sonstiges'];
+const availability=['Nein','Teilweise','Ja','Nicht erforderlich'];
+const progress=['Noch nicht angefragt','Angefragt','In Bearbeitung','Zur Unterschrift','Abgeschlossen'];
 
 export default function ProviderDocuments({providerId}:{providerId:string}){
- const [rows,setRows]=useState<DocumentRow[]>([]),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- async function load(){setLoading(true);const r=await supabase.from('crm_provider_documents').select('*').eq('provider_id',providerId).order('created_at',{ascending:false});setLoading(false);if(r.error)throw r.error;setRows(r.data||[]);}
- useEffect(()=>{load().catch(e=>setError(e.message));},[providerId]);
- async function upload(e:FormEvent<HTMLFormElement>){
-  e.preventDefault();setBusy(true);setError('');setNotice('');
-  const form=new FormData(e.currentTarget),file=form.get('file') as File,type=String(form.get('document_type')||''),valid=String(form.get('valid_until')||'');
-  try{
-   if(!file?.size)throw new Error('Bitte eine Datei auswählen.');
-   if(file.size>15728640)throw new Error('Die Datei darf höchstens 15 MB gross sein.');
-   const allowed=['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/msword','image/jpeg','image/png'];
-   if(!allowed.includes(file.type))throw new Error('Erlaubt sind PDF, Word, JPG und PNG.');
-   const safe=file.name.replace(/[^a-zA-Z0-9._-]+/g,'_').slice(-180),path=`${providerId}/${crypto.randomUUID()}-${safe}`;
-   const up=await supabase.storage.from('provider-documents').upload(path,file,{contentType:file.type,upsert:false});if(up.error)throw up.error;
-   const meta=await supabase.from('crm_provider_documents').insert({provider_id:providerId,file_name:file.name,storage_path:path,document_type:type,mime_type:file.type,file_size:file.size,valid_until:valid||null});
-   if(meta.error){await supabase.storage.from('provider-documents').remove([path]);throw meta.error;}
-   (e.currentTarget as HTMLFormElement).reset();await load();setNotice('Dokument gespeichert.');
-  }catch(e){setError(e instanceof Error?e.message:'Upload fehlgeschlagen.');}finally{setBusy(false);}
+ const [rows,setRows]=useState<Entry[]>([]),[editing,setEditing]=useState<Entry|null>(null),[showForm,setShowForm]=useState(false),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ async function load(){const r=await supabase.from('crm_provider_document_register').select('*').eq('provider_id',providerId).order('updated_at',{ascending:false});if(r.error)throw r.error;setRows(r.data||[]);}
+ useEffect(()=>{let active=true;setLoading(true);setRows([]);setShowForm(false);setEditing(null);setError('');supabase.from('crm_provider_document_register').select('*').eq('provider_id',providerId).order('updated_at',{ascending:false}).then(r=>{if(!active)return;if(r.error)setError(r.error.message);else setRows(r.data||[]);setLoading(false);});return()=>{active=false;};},[providerId]);
+ async function save(e:FormEvent<HTMLFormElement>){
+  e.preventDefault();const form=new FormData(e.currentTarget);setBusy(true);setError('');setNotice('');
+  const value=(name:string)=>String(form.get(name)||'').trim();
+  const data={provider_id:providerId,title:value('title'),document_type:value('document_type'),availability:value('availability'),progress:value('progress'),storage_location:value('storage_location'),responsible_person:value('responsible_person'),prepared_by:value('prepared_by'),notes:value('notes'),updated_at:new Date().toISOString()};
+  try{if(!data.title)throw new Error('Bitte eine Bezeichnung eingeben.');const r=editing?await supabase.from('crm_provider_document_register').update(data).eq('id',editing.id).eq('provider_id',providerId).select('id').single():await supabase.from('crm_provider_document_register').insert(data).select('id').single();if(r.error)throw r.error;await load();setShowForm(false);setEditing(null);setNotice('Dokumentstand gespeichert.');}catch(e){setError(e instanceof Error?e.message:'Speichern fehlgeschlagen.');}finally{setBusy(false);}
  }
- async function open(row:DocumentRow){
-  setError('');const r=await supabase.storage.from('provider-documents').createSignedUrl(row.storage_path,60);
-  if(r.error){setError(r.error.message);return;}window.open(r.data.signedUrl,'_blank','noopener,noreferrer');
- }
- async function remove(row:DocumentRow){
-  if(!window.confirm(`${row.file_name} wirklich löschen?`))return;setBusy(true);setError('');setNotice('');
-  try{const f=await supabase.storage.from('provider-documents').remove([row.storage_path]);if(f.error)throw f.error;const m=await supabase.from('crm_provider_documents').delete().eq('id',row.id);if(m.error)throw m.error;await load();setNotice('Dokument gelöscht.');}catch(e){setError(e instanceof Error?e.message:'Löschen fehlgeschlagen.');}finally{setBusy(false);}
- }
- return <section className="provider-documents"><h3>Dokumente</h3><p className="muted">Verträge, Angebote und Nachweise dieses Kursanbieters. Dateien sind privat und nur für CRM-Mitarbeiter zugänglich.</p>
+ return <section className="provider-documents"><h3>Dokumente & Vertragsstand</h3><p className="muted">Hier verwaltest du den Stand der Unterlagen dieses Kursanbieters. Es werden keine Dateien hochgeladen – nur Status, Zuständigkeit und ein Hinweis zum externen Ablageort.</p>
  {error&&<p className="error" role="alert">{error}</p>}{notice&&<p className="notice" role="status">{notice}</p>}
- <form className="document-upload" onSubmit={upload}><label>Dokumenttyp<select name="document_type" required>{types.map(t=><option key={t}>{t}</option>)}</select></label><label>Gültig bis (optional)<input name="valid_until" type="date"/></label><label className="document-file">Datei<input name="file" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" required/></label><button disabled={busy}>{busy?'Speichern …':'Dokument hochladen'}</button></form>
- {loading?<p>Dokumente werden geladen …</p>:rows.length===0?<p className="muted">Noch keine Dokumente hinterlegt.</p>:<div className="document-list">{rows.map(r=><article key={r.id}><div><strong>{r.file_name}</strong><small>{r.document_type} · {fmt(r.file_size)} · hochgeladen am {new Date(r.created_at).toLocaleDateString('de-CH')}{r.valid_until?` · gültig bis ${new Date(r.valid_until+'T00:00:00').toLocaleDateString('de-CH')}`:''}</small></div><div className="row-actions"><button type="button" className="secondary" onClick={()=>open(r)}>Öffnen / herunterladen</button><button type="button" className="danger" disabled={busy} onClick={()=>remove(r)}>Löschen</button></div></article>)}</div>}
+ {!showForm&&<button type="button" disabled={loading} onClick={()=>{setEditing(null);setShowForm(true);setNotice('');}}>Dokumentstand erfassen</button>}
+ {showForm&&<form className="document-register-form" key={editing?.id||'new'} onSubmit={save}>
+ <fieldset className="profile-field-group"><legend>Unterlage & Bearbeitungsstand</legend><div className="register-fields">
+ <label>Bezeichnung<input name="title" required maxLength={200} defaultValue={editing?.title||''} placeholder="z. B. Anbietervereinbarung 2026"/></label>
+ <label>Art der Unterlage<select name="document_type" defaultValue={editing?.document_type||types[0]}>{types.map(t=><option key={t}>{t}</option>)}</select></label>
+ <label>Liegt uns die Unterlage vor?<select name="availability" defaultValue={editing?.availability||'Nein'}>{availability.map(t=><option key={t}>{t}</option>)}</select></label>
+ <label>Bearbeitungsstand<select name="progress" defaultValue={editing?.progress||progress[0]}>{progress.map(t=><option key={t}>{t}</option>)}</select></label>
+ </div></fieldset>
+ <fieldset className="profile-field-group"><legend>Ablage & Zuständigkeit</legend><div className="register-fields">
+ <label className="register-wide">Wo ist die Unterlage abgelegt?<input name="storage_location" maxLength={1000} defaultValue={editing?.storage_location||''} placeholder="z. B. Firmenlaufwerk / Verträge / Anbieter oder Ordner im Büro"/><small>Nur den Ablagehinweis eintragen, keine Vertragsinhalte oder Zugangsdaten.</small></label>
+ <label>Verantwortliche Person<input name="responsible_person" maxLength={200} defaultValue={editing?.responsible_person||''} placeholder="Wer kümmert sich um den nächsten Schritt?"/></label>
+ <label>Unterlage erstellt / bearbeitet von<input name="prepared_by" maxLength={200} defaultValue={editing?.prepared_by||''} placeholder="Name der Person oder externen Stelle"/></label>
+ <label className="register-wide">Nächster Schritt / interne Notiz<textarea name="notes" maxLength={2000} defaultValue={editing?.notes||''} placeholder="z. B. Unterschrift beim Anbieter nachfragen"/></label>
+ </div></fieldset>
+ <div className="row-actions"><button disabled={busy}>{busy?'Speichern …':'Dokumentstand speichern'}</button><button type="button" className="secondary" disabled={busy} onClick={()=>{setShowForm(false);setEditing(null);setError('');}}>Abbrechen</button></div></form>}
+ {loading?<p>Dokumentstände werden geladen …</p>:rows.length===0?<p className="muted">Noch kein Dokumentstand erfasst. Halte hier beispielsweise fest, ob die Anbietervereinbarung bereits unterschrieben vorliegt.</p>:<div className="document-register-list">{rows.map(r=><article className="document-register-card" key={r.id}><div className="register-card-heading"><div><small>{r.document_type}</small><h4>{r.title}</h4></div><button type="button" className="secondary" disabled={busy} onClick={()=>{setEditing(r);setShowForm(true);setError('');setNotice('');}}>Bearbeiten</button></div><dl className="register-data">
+ <div><dt>Unterlage vorhanden</dt><dd>{r.availability}</dd></div><div><dt>Bearbeitungsstand</dt><dd>{r.progress}</dd></div>
+ <div className="register-wide"><dt>Ablageort</dt><dd>{r.storage_location||'Noch nicht eingetragen'}</dd></div>
+ <div><dt>Verantwortlich</dt><dd>{r.responsible_person||'Noch nicht zugeteilt'}</dd></div><div><dt>Erstellt / bearbeitet von</dt><dd>{r.prepared_by||'Noch nicht eingetragen'}</dd></div>
+ {r.notes&&<div className="register-wide"><dt>Nächster Schritt / Notiz</dt><dd>{r.notes}</dd></div>}</dl><small className="muted">Stand aktualisiert am {new Date(r.updated_at).toLocaleString('de-CH')}</small></article>)}</div>}
  </section>;
 }

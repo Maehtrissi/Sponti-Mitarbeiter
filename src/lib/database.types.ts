@@ -14,6 +14,12 @@ export type Database = {
   }
   public: {
     Tables: {
+      crm_provider_document_register: {
+        Row: { id: string; provider_id: string; title: string; document_type: string; availability: string; progress: string; storage_location: string; responsible_person: string; prepared_by: string; notes: string; updated_at: string; created_at: string }
+        Insert: { id?: string; provider_id: string; title: string; document_type?: string; availability?: string; progress?: string; storage_location?: string; responsible_person?: string; prepared_by?: string; notes?: string; updated_at?: string; created_at?: string }
+        Update: { id?: string; provider_id?: string; title?: string; document_type?: string; availability?: string; progress?: string; storage_location?: string; responsible_person?: string; prepared_by?: string; notes?: string; updated_at?: string; created_at?: string }
+        Relationships: []
+      }
       guest_course_requests: {
         Row: { id: string; course_id: string; guest_name: string; guest_email: string; guest_phone: string; quantity: number; status: string; created_at: string }
         Insert: { id?: string; course_id: string; guest_name: string; guest_email: string; guest_phone?: string; quantity?: number; status?: string; created_at?: string }
