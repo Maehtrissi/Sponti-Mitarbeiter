@@ -17,3 +17,15 @@
 .auth-account { position: fixed; right: 20px; bottom: 18px; z-index: 60; display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 40px); padding: 10px 14px; border-radius: 12px; background: #fff; box-shadow: 0 4px 20px #19342d22; color: #19342d; font-size: 12px; }
 .auth-account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .auth-account button { background: #007d70; color: #fff; border: 0; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+
+/* Match the private sign-in to the refreshed workspace. */
+.auth-page{background:radial-gradient(ellipse at 12% 10%,#dce8d5 0,transparent 45%),radial-gradient(ellipse at 95% 100%,#f0dfca 0,transparent 40%),#f5f7f1}
+.auth-card{border-color:#e0e7dc;background:#fffefb;box-shadow:0 24px 70px #19342d0d;border-radius:24px}
+.auth-brand{color:#193e30;letter-spacing:-1px}
+.auth-brand span{color:#72816f;background:#edf3e8;letter-spacing:1px}
+.auth-eyebrow{color:#8b7258;letter-spacing:1.5px;font-size:10px}
+.auth-card h1{letter-spacing:-1px;color:#19342d}
+.auth-card input{border-color:#d7e1d4;background:#fcfdfb;border-radius:11px}
+.auth-submit,.auth-account button{background:#244f3d}
+.auth-submit:hover{background:#32624b}
+.auth-account{border:1px solid #e0e7dc;box-shadow:0 4px 18px #19342d0d}

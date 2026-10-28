@@ -34,3 +34,87 @@
 .crm-attribute-grid input,.crm-attribute-grid select{width:100%;min-width:0;min-height:40px;border:1px solid #cbd9ce;border-radius:9px;padding:8px 10px;background:white;color:#19342d;box-sizing:border-box;font-size:13px}
 .crm-attribute-filters>small{display:block;margin-top:13px;color:#597566}
 @media(max-width:650px){.crm-attribute-filters{padding:13px}.crm-attribute-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.crm-attribute-heading{align-items:flex-start}.crm-attribute-heading button{white-space:nowrap}}
+
+/* Sponti workspace refresh: quiet surfaces, precise controls and clear hierarchy. */
+.crm{--crm-ink:#19342d;--crm-muted:#697b73;--crm-line:#e1e9e3;--crm-accent:#e4aa7b;color:var(--crm-ink);background:#f3f6f3;font-size:14px;line-height:1.6}
+.crm.workspace{background:radial-gradient(ellipse at 100% 0,#e9f0e6 0,transparent 45%),#f3f6f3}
+.crm h1{font-size:clamp(28px,3vw,36px);font-weight:750;letter-spacing:-1.3px;line-height:1.2}
+.crm h2{font-size:20px;letter-spacing:-.5px;margin-bottom:18px}
+.crm h3{font-size:16px;letter-spacing:-.2px}
+.crm aside{width:264px;padding:30px 20px 22px;background:#153c30;color:#eef5ed;border:0;overflow-y:auto;box-shadow:4px 0 24px #173e3010}
+.crm aside .brand{color:#fff9ef;font-size:38px;letter-spacing:-2.2px;padding:0 14px}
+.crm aside .brand span{color:#e7b58b}
+.crm aside>.eyebrow{color:#9eb8aa;font-size:9px;letter-spacing:1.6px;margin:4px 14px 28px}
+.crm .nav-groups{gap:22px;margin-top:8px;padding-bottom:26px}
+.crm .nav-heading{color:#91ac9d;font-size:9px;letter-spacing:1.5px;padding:0 14px 7px}
+.crm nav button{min-height:43px;padding:10px 14px;border-radius:11px;color:#cfdfd4;font-size:13px;font-weight:500;gap:10px;align-items:center}
+.crm nav button:hover{background:#ffffff0c;color:white}
+.crm nav button.active{background:#e3eddd;color:#163d2f;font-weight:700;box-shadow:0 4px 12px #0000000b}
+.crm nav button span{min-width:24px;text-align:center;font-size:10px;line-height:22px;padding:0 6px;border-radius:6px;background:#ffffff10;color:#c9dbcf}
+.crm nav button.active span{background:#cbdcc5;color:#28513b}
+.crm .account{padding:18px 12px 0;border-top:1px solid #ffffff18}
+.crm .account small{color:#a9c0b2;font-size:11px}
+.crm .account .secondary{background:#ffffff0c;border:1px solid #ffffff20;color:#e2ede4;box-shadow:none}
+.crm .account .secondary:hover{background:#ffffff18}
+.crm main{margin-left:264px;width:calc(100% - 264px);max-width:1800px;padding:38px clamp(24px,3.4vw,56px) 64px}
+.crm header{margin-bottom:30px;gap:18px;padding-bottom:25px;border-bottom:1px solid #dce6df}
+.crm header .eyebrow{font-size:10px;color:#809085;letter-spacing:1.8px;margin-bottom:9px}
+.crm .workspace-description{margin:10px 0 0;color:#738278;font-size:13px;max-width:65ch}
+.crm .connection{background:#e8f0e6;color:#4c7354;border:1px solid #d6e3d3;font-size:11px;padding:7px 12px;white-space:nowrap}
+.crm button,.crm .file-upload-button{border-radius:10px;font-size:13px;font-weight:600;padding:10px 16px;background:#244f3d;box-shadow:0 2px 4px #19342d08;transition:background .18s,box-shadow .18s,transform .18s}
+.crm button:hover{background:#32624b;box-shadow:0 3px 8px #19342d12}
+.crm button:focus-visible,.crm .file-upload-button:focus-within{outline:3px solid #dea879;outline-offset:3px}
+.crm .secondary{background:#f0f4ee;color:#3f624c;border:1px solid #dce6d8;box-shadow:none}
+.crm .secondary:hover{background:#e4eddf}
+.crm .danger{background:#fcf1ee;border:1px solid #f0d9d2;color:#a35a46;box-shadow:none}
+.crm .danger:hover{background:#f8e2dc}
+.crm input,.crm select,.crm textarea{border-color:#dbe4dd;border-radius:10px;min-height:43px;padding:10px 13px;background:#fdfefd;font-size:13px;transition:border-color .18s,box-shadow .18s}
+.crm input::placeholder,.crm textarea::placeholder{color:#98a69e}
+.crm input:focus,.crm select:focus,.crm textarea:focus{outline:0;border-color:#6a9278;box-shadow:0 0 0 3px #dcebdc}
+.crm label{color:#496052;font-size:12px;font-weight:600}
+.crm .stats{gap:18px;margin-bottom:26px}
+.crm .stats article,.crm .panel{border:1px solid #e1e8e0;background:#fff;border-radius:18px;box-shadow:0 4px 18px #1b432a04}
+.crm .stats article{padding:22px 24px;position:relative;overflow:hidden}
+.crm .stats article::before{content:"";position:absolute;left:0;top:22px;bottom:22px;width:3px;border-radius:0 3px 3px 0;background:#99b995}
+.crm .stats article:nth-child(3)::before{background:#dfa274}
+.crm .stats article:nth-child(4)::before{background:#a5b9c9}
+.crm .stats span{font-size:12px;font-weight:500;color:#78887d}
+.crm .stats strong{font-size:37px;line-height:1.2;color:#244f3d;margin-top:12px;font-weight:650;letter-spacing:-1.5px;font-variant-numeric:tabular-nums}
+.crm .panel{padding:26px}
+.crm .split{gap:22px}
+.crm .toolbar{gap:12px;padding-bottom:20px;border-bottom:1px solid #edf1ec;margin-bottom:20px}
+.crm .toolbar>input{background:#f7f9f6}
+.crm .table-wrap{border:1px solid #e7ece5;border-radius:12px}
+.crm th{background:#f7f9f5;padding:13px 16px;font-size:10px;letter-spacing:.8px;font-weight:650;white-space:nowrap}
+.crm td{padding:17px 16px;border-color:#edf1eb;font-size:12px;vertical-align:middle}
+.crm tbody tr:last-child td{border-bottom:0}
+.crm tbody tr:hover{background:#fafcf8}
+.crm .text-button{font-weight:650;font-size:13px;box-shadow:none}
+.crm .text-button:hover{box-shadow:none}
+.crm .row-actions{gap:6px}
+.crm .row-actions button{font-size:11px;padding:6px 10px;border-radius:7px}
+.crm .badge{background:#edf4e8;color:#527047;border:1px solid #dfe9d8;padding:4px 9px;font-size:10px;font-weight:600}
+.crm .muted,.crm small{color:#7d8c82}
+.crm .task{padding:16px 0;border-color:#edf1eb}
+.crm .task strong,.crm .contact-row strong{font-size:13px;font-weight:600}
+.crm .contact-row{padding:15px 0;box-shadow:none}
+.crm .contact-row:hover{box-shadow:none}
+.crm .crm-attribute-filters{background:#f6f8f3;border-color:#e2e9dd;padding:18px;border-radius:12px}
+.crm .crm-attribute-heading strong{font-size:12px}
+.crm .crm-attribute-grid{gap:10px 14px}
+.crm .crm-attribute-grid label{font-size:11px;margin-bottom:4px}
+.crm .crm-attribute-grid input,.crm .crm-attribute-grid select{min-height:38px;font-size:12px;background:#fff}
+.crm .dialog{border:1px solid #e3eae0;border-radius:22px;padding:32px;box-shadow:0 25px 100px #102b2a35}
+.crm .overlay{background:#102d2666;backdrop-filter:blur(4px)}
+.crm .close{background:#f3f6f0;color:#62775f;box-shadow:none;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;padding:0;font-size:22px}
+.crm .note{background:#f5f8f1;border:1px solid #e7ede2;border-radius:12px}
+.crm .notice{background:#eaf3e5;border:1px solid #d5e7cb;color:#43683b;font-size:13px}
+.crm .error{background:#fdf0ec;border:1px solid #f0d7cd;color:#9d533d;font-size:13px}
+.crm .empty{padding:48px 24px}
+.crm .empty h2{font-size:18px}
+.crm dl>div{padding:12px 0;border-color:#edf1e9}
+.crm .crm-profile-editor{border-color:#e2e9de;border-radius:14px;background:#fbfcf9}
+.crm .internal-file-list article,.crm .document-list article{border-color:#edf1e9}
+@media(max-width:1100px) and (min-width:651px){.crm aside{width:222px;padding:25px 15px}.crm main{margin-left:222px;width:calc(100% - 222px);padding:30px 24px}.crm .stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.crm aside{position:relative;width:100%;padding:18px 16px 14px;overflow:visible}.crm aside .brand{font-size:30px;padding:0 2px}.crm .nav-groups{margin:15px 0 0;padding:0 0 7px;gap:8px;overflow:auto}.crm .nav-group{flex-shrink:0}.crm nav button{min-height:38px;padding:8px 12px;font-size:12px}.crm .account{padding:12px 0 0;margin-top:8px;gap:12px}.crm .account .secondary{padding:7px 12px}.crm main{margin:0;width:100%;padding:26px 16px 50px}.crm header{padding-bottom:20px;margin-bottom:22px}.crm .workspace-description{font-size:12px}.crm .panel{padding:18px;border-radius:15px}.crm .stats{gap:11px}.crm .stats article{padding:18px}.crm .stats strong{font-size:30px}.crm .toolbar{padding-bottom:16px;gap:10px}.crm .toolbar>select{max-width:none;flex:1}.crm .toolbar>button{flex:0 0 auto}.crm .dialog{padding:28px 20px}.crm .connection{display:none}.crm th,.crm td{padding:12px}.crm .row-actions{min-width:155px}.crm .crm-attribute-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.crm button,.crm input,.crm select,.crm textarea{transition:none}}
