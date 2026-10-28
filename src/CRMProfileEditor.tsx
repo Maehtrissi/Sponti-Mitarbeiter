@@ -42,11 +42,11 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
  const id=contactId.slice(contactId.indexOf(':')+1);
  useEffect(()=>{
   let active=true;setLoading(true);setError('');setData(null);
-  supabase.rpc('crm_profile_editor',{p_kind:kind,p_contact_id:id,p_changes:null}).then(({data,error})=>{
+  Promise.resolve(supabase.rpc('crm_profile_editor',{p_kind:kind,p_contact_id:id,p_changes:null})).then(({data,error})=>{
    if(!active)return;
    if(error){setError(error.message);return;}
    const result=data as unknown as Result;setData(result);setState({...result.profile,...(result.preferences||{})});
-  }).catch(e=>{if(active)setError(String(e))}).finally(()=>{if(active)setLoading(false)});
+  }).catch((e:unknown)=>{if(active)setError(String(e))}).finally(()=>{if(active)setLoading(false)});
   return()=>{active=false};
  },[id,kind]);
  const edit=(key:string,value:unknown)=>setState(s=>({...s,[key]:value}));
