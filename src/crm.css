@@ -120,3 +120,13 @@
 @media(prefers-reduced-motion:reduce){.crm button,.crm input,.crm select,.crm textarea{transition:none}}
 
 .crm input[type="checkbox"],.crm input[type="radio"]{width:17px;min-height:0;height:17px;padding:0;accent-color:#315e44;flex:none}.crm .crm-profile-checks label{margin-bottom:0;padding:6px 9px;background:#f0f5eb;border-radius:8px;font-weight:500}.crm .crm-profile-checks input{margin:0;display:inline-block}
+
+/* Wider contact dialogs with a compact overview on desktop. */
+.crm .dialog{width:960px;max-width:calc(100vw - 48px);padding:34px 38px;scrollbar-gutter:stable;overscroll-behavior:contain}
+.crm .dialog dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:30px;margin:20px 0}
+.crm .dialog dl>div{grid-template-columns:105px minmax(0,1fr);align-items:baseline;padding:12px 0;min-width:0}
+.crm .dialog .crm-profile-editor{padding:22px;margin:24px 0}
+.crm .dialog .crm-profile-grid{column-gap:20px}
+.crm .dialog>.close{right:16px;top:16px}
+@media(min-width:1200px){.crm .dialog{width:1040px}}
+@media(max-width:700px){.crm .dialog{width:100%;max-width:100%;padding:28px 20px}.crm .dialog dl{grid-template-columns:1fr;gap:0}.crm .dialog .crm-profile-editor{padding:16px}.crm .dialog .crm-profile-grid{grid-template-columns:1fr}}
