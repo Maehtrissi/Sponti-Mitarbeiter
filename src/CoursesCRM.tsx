@@ -1,6 +1,7 @@
 import {useEffect,useState,type FormEvent} from 'react';
 import {supabase} from './lib/supabase';
 import GuestCourseRequests from './GuestCourseRequests';
+import CourseBookingsCRM from './CourseBookingsCRM';
 import type {Tables,TablesInsert} from './lib/database.types';
 import {courseCategories,courseRegions,coursePayload,toLocalInput} from './lib/courses';
 type Course=Tables<'courses'>;
@@ -43,7 +44,7 @@ export default function CoursesCRM({initialProviderId='',openNew=false,assignExi
  const assignmentProvider=approvedProviders.find(p=>p.id===initialProviderId);
  const providerName=(id:string|null)=>providers.find(p=>p.id===id)?.company||(id?'Bisheriger Anbieter':'Noch nicht zugeordnet');
  const visible=courses.filter(c=>(filter==='archived'?!!c.archived_at:!c.archived_at&&(filter==='active'||c.status===filter))&&(providerFilter==='unassigned'?!c.provider_id:!providerFilter||c.provider_id===providerFilter)&&`${c.title} ${c.venue} ${providerName(c.provider_id)}`.toLowerCase().includes(query.toLowerCase()));
- return <><GuestCourseRequests/><section className="panel courses-crm"><p>Erfasse einen Kurs mit allen Angaben. Wähle den Kursanbieter direkt aus oder speichere zunächst ohne Zuordnung und ergänze ihn später über „Bearbeiten“. Entscheide, welche auf <a href="https://sponti-switzerland.ch/kurse.html" target="_blank" rel="noopener noreferrer">Kurse entdecken ↗</a> erscheinen. Entwürfe bleiben intern. Termine und Uhrzeiten werden auf der Website in Schweizer Zeit angezeigt.</p>
+ return <><CourseBookingsCRM/><GuestCourseRequests/><section className="panel courses-crm"><p>Erfasse einen Kurs mit allen Angaben. Wähle den Kursanbieter direkt aus oder speichere zunächst ohne Zuordnung und ergänze ihn später über „Bearbeiten“. Entscheide, welche auf <a href="https://sponti-switzerland.ch/kurse.html" target="_blank" rel="noopener noreferrer">Kurse entdecken ↗</a> erscheinen. Entwürfe bleiben intern. Termine und Uhrzeiten werden auf der Website in Schweizer Zeit angezeigt.</p>
  {error&&<p role="alert" className="error">{error}</p>}{notice&&<p role="status" className="notice">{notice}</p>}
  {editor?<form onSubmit={save}><div className="toolbar"><h2>{editor.id?'Kurs bearbeiten':initialProviderId?'Neuer Kurs für '+providerName(initialProviderId):'Neuer Kurs'}</h2><button type="button" className="secondary" disabled={busy} onClick={()=>setEditor(null)}>Abbrechen</button></div>
  <fieldset disabled={busy||loading} className="course-fields"><div className="form-grid">
