@@ -477,6 +477,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      crm_cancel_free_booking: { Args: { p_booking_id: string }; Returns: boolean }
       crm_course_bookings: {
         Args: never
         Returns: {
