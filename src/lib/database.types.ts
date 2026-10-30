@@ -465,6 +465,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      crm_course_bookings: {
+        Args: never
+        Returns: {
+          id: string
+          course_id: string
+          course_title: string
+          guest_name: string
+          guest_email: string
+          guest_phone: string
+          quantity: number
+          total_chf: number
+          booking_status: string
+          payment_status: string
+          created_at: string
+          starts_at: string
+          venue: string
+        }[]
+      }
       crm_is_employee: { Args: never; Returns: boolean }
       crm_profile_editor: { Args: { p_kind: string; p_contact_id: string; p_changes?: Json | null }; Returns: Json }
       customer_profile: { Args: { profile?: Json }; Returns: Json }
