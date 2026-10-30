@@ -14,6 +14,12 @@ export type Database = {
   }
   public: {
     Tables: {
+      crm_prospects: {
+        Row: { id: string; company: string; contact_name: string; email: string; phone: string; location: string; website: string; stage: string; next_contact: string | null; notes: string; created_at: string; updated_at: string }
+        Insert: { id?: string; company: string; contact_name?: string; email?: string; phone?: string; location?: string; website?: string; stage?: string; next_contact?: string | null; notes?: string; created_at?: string; updated_at?: string }
+        Update: { id?: string; company?: string; contact_name?: string; email?: string; phone?: string; location?: string; website?: string; stage?: string; next_contact?: string | null; notes?: string; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
       homepage_featured_course: {
         Row: { id: number; course_id: string | null; updated_at: string }
         Insert: { id?: number; course_id?: string | null; updated_at?: string }
