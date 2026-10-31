@@ -1,3 +1,4 @@
+import ReviewsCRM from './ReviewsCRM';
 import CoursesCRM from './CoursesCRM';
 import CourseCalendarCRM from './CourseCalendarCRM';
 import NewsCRM from './NewsCRM';
@@ -7,5 +8,5 @@ import AcquisitionCRM from './AcquisitionCRM';
 import OperationsDashboard from './OperationsDashboard';
 import {supabaseCRMRequest} from './lib/supabaseCRM';
 export default function SupabaseCRM() {
-  return <IndependentCRM request={supabaseCRMRequest} storageLabel="Supabase verbunden" allowImport={false} newsSection={<NewsCRM />} calendarSection={<CourseCalendarCRM />} acquisitionSection={<AcquisitionCRM />} operationsSection={<OperationsDashboard />} featuredCourseSection={<FeaturedCourseCRM />} coursesSection={context=><CoursesCRM key={(context.providerId||'all')+(context.assign?'assign':'view')} initialProviderId={context.providerId} openNew={context.create} assignExisting={context.assign}/>}  />;
+  return <IndependentCRM request={supabaseCRMRequest} storageLabel="Supabase verbunden" allowImport={false} newsSection={<NewsCRM />} reviewsSection={<ReviewsCRM />} calendarSection={<CourseCalendarCRM />} acquisitionSection={<AcquisitionCRM />} operationsSection={<OperationsDashboard />} featuredCourseSection={<FeaturedCourseCRM />} coursesSection={context=><CoursesCRM key={(context.providerId||'all')+(context.assign?'assign':'view')} initialProviderId={context.providerId} openNew={context.create} assignExisting={context.assign}/>}  />;
 }

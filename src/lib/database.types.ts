@@ -14,6 +14,12 @@ export type Database = {
   }
   public: {
     Tables: {
+      course_reviews: {
+        Row: {id:string;name:string;course:string;review:string;status:string;created_at:string;reply:string;replied_at:string|null}
+        Insert: {id?:string;name:string;course:string;review:string;status?:string;created_at?:string;reply?:string;replied_at?:string|null}
+        Update: {status?:string;reply?:string}
+        Relationships: []
+      }
       crm_prospects: {
         Row: { id: string; company: string; contact_name: string; email: string; phone: string; location: string; website: string; stage: string; next_contact: string | null; notes: string; created_at: string; updated_at: string }
         Insert: { id?: string; company: string; contact_name?: string; email?: string; phone?: string; location?: string; website?: string; stage?: string; next_contact?: string | null; notes?: string; created_at?: string; updated_at?: string }

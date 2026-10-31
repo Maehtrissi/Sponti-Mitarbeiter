@@ -194,3 +194,5 @@
 .crm-media-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:16px 0}
 .crm-media-gallery img{height:140px}
 @media(max-width:700px){.crm-media-identity{grid-template-columns:1fr}.crm-media-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.review-admin-list{display:grid;gap:20px}.review-admin-card{padding:24px;border:1px solid #dce5dc;border-radius:16px;background:#fff}.crm .review-admin-card header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin:0 0 20px;padding:0;background:none;border:0}.review-admin-card h3{margin:0 0 6px}.review-admin-card small{color:#65776d}.review-body,.review-admin-reply p{white-space:pre-wrap;overflow-wrap:anywhere}.review-admin-reply{background:#f1f5ec;border-left:3px solid #718a60;padding:16px;border-radius:0 12px 12px 0;margin:18px 0}.review-admin-card form{margin:20px 0;padding:20px;background:#fafbf7;border-radius:12px}.review-admin-card label{display:block}.review-admin-card textarea{width:100%;box-sizing:border-box}.review-admin-card .row-actions{margin-top:16px;flex-wrap:wrap}
