@@ -6,10 +6,10 @@ interface SettingsViewProps {
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
   const [gatewayStatus, setGatewayStatus] = useState('Online (99.98%)');
-  const [apiKey, setApiKey] = useState('sponti_live_sec_89f0293da9218ab4401e');
+  const [apiKey] = useState('');
   const [autoApproveDeals, setAutoApproveDeals] = useState(false);
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(true);
-  const [payoutBankIban, setPayoutBankIban] = useState('DE89 7002 0270 0012 3456 78');
+  const [payoutBankIban] = useState('');
 
   const handleSave = () => {
     onShowToast('Einstellungen gespeichert', 'Die Systemeinstellungen für Sponti B2B Core wurden aktualisiert.', 'success');
@@ -54,13 +54,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
                 readOnly
                 className="w-full px-space-md py-2 bg-surface-container-low rounded-lg font-mono text-body-sm text-on-surface border border-surface-container"
               />
-              <button
-                type="button"
-                onClick={() => onShowToast('API-Key kopiert', 'Der API-Schlüssel wurde in die Zwischenablage kopiert.', 'info')}
-                className="px-3 py-2 bg-surface-container hover:bg-surface-container-high rounded-lg text-on-surface font-label-md shrink-0 font-medium"
-              >
-                Kopieren
-              </button>
+              <span className="text-body-sm text-on-surface-variant">Keine Zugangsdaten im Frontend hinterlegen. API-Schlüssel gehören ausschliesslich in serverseitige Secrets.</span>
             </div>
           </div>
 
@@ -105,7 +99,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
             <input
               type="text"
               value={payoutBankIban}
-              onChange={(e) => setPayoutBankIban(e.target.value)}
+              readOnly
+              placeholder="Nicht konfiguriert"
               className="w-full px-space-md py-2 bg-surface-container-low rounded-lg font-body-md text-on-surface border border-surface-container"
             />
           </div>
