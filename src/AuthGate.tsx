@@ -1,10 +1,12 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react';
+import React, { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import { hasEmployeeAccess } from './lib/employeeAccess';
 import './auth.css';
 
 const Dashboard = lazy(() => import('./SupabaseCRM'));
+
+type MfaMode = 'none' | 'setup' | 'verify' | 'ready';
 
 export default function AuthGate() {
   const [user, setUser] = useState<User | null>(null);
@@ -13,6 +15,25 @@ export default function AuthGate() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [mfaMode, setMfaMode] = useState<MfaMode>('none');
+  const [factorId, setFactorId] = useState('');
+  const [qrCode, setQrCode] = useState('');
+  const [code, setCode] = useState('');
+
+  const checkMfa = useCallback(async () => {
+    const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+    if (factorsError) throw factorsError;
+    const verified = factors.totp.find(f => f.status === 'verified');
+    if (!verified) {
+      setFactorId('');
+      setMfaMode('setup');
+      return;
+    }
+    setFactorId(verified.id);
+    const { data: assurance, error: assuranceError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (assuranceError) throw assuranceError;
+    setMfaMode(assurance.currentLevel === 'aal2' ? 'ready' : 'verify');
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -28,9 +49,13 @@ export default function AuthGate() {
           if (!active || current !== version) return;
           allowed = !access.error && access.data === true;
         }
-        setUser(allowed ? data.user : null);
-        if (!authError && data.user && !allowed) {
-          setError('Dein Konto ist noch nicht für den Mitarbeiterbereich freigeschaltet.');
+        if (!allowed) {
+          setUser(null);
+          setMfaMode('none');
+          if (!authError && data.user) setError('Dein Konto ist noch nicht für den Mitarbeiterbereich freigeschaltet.');
+        } else {
+          setUser(data.user);
+          await checkMfa();
         }
       } catch {
         if (active && current === version) {
@@ -46,14 +71,14 @@ export default function AuthGate() {
       if (event === 'SIGNED_OUT') {
         ++version;
         setUser(null);
+        setMfaMode('none');
         setChecking(false);
       } else {
-        // Keep Auth callbacks synchronous to avoid a lock in the Auth client.
         setTimeout(() => { if (active) void verify(); }, 0);
       }
     });
     return () => { active = false; ++version; subscription.unsubscribe(); };
-  }, []);
+  }, [checkMfa]);
 
   const signIn = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -77,16 +102,85 @@ export default function AuthGate() {
     }
   };
 
+  const beginEnrollment = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const { data, error: enrollError } = await supabase.auth.mfa.enroll({
+        factorType: 'totp', friendlyName: 'Sponti Mitarbeiter',
+      });
+      if (enrollError) throw enrollError;
+      setFactorId(data.id);
+      setQrCode(data.totp.qr_code);
+    } catch {
+      setError('QR-Code konnte nicht erstellt werden. Bitte erneut versuchen.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const confirmCode = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (busy || !/^\d{6}$/.test(code)) return;
+    setBusy(true);
+    setError('');
+    try {
+      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId });
+      if (challengeError) throw challengeError;
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId, challengeId: challenge.id, code,
+      });
+      if (verifyError) throw verifyError;
+      setCode('');
+      setQrCode('');
+      await checkMfa();
+    } catch {
+      setError('Code ungültig oder abgelaufen. Bitte den aktuellen Code eingeben.');
+    } finally {
+      setBusy(false);
+    }
+  };
 
   if (checking) return <div className="auth-page" role="status">Anmeldung wird geprüft …</div>;
-  if (user) return (
-    <>
-      <Suspense fallback={<div className="auth-page" role="status">Dashboard wird geladen …</div>}>
-        <Dashboard />
-      </Suspense>
-
-    </>
+  if (user && mfaMode === 'ready') return (
+    <Suspense fallback={<div className="auth-page">Dashboard wird geladen …</div>}>
+      <Dashboard />
+    </Suspense>
   );
+  if (user && (mfaMode === 'setup' || mfaMode === 'verify')) return (
+    <main className="auth-page">
+      <section className="auth-card" aria-labelledby="mfa-title">
+        <a className="auth-brand" href="/">Sponti <span>Mitarbeiter</span></a>
+        <h1 id="mfa-title">{mfaMode === 'setup' ? 'Google Authenticator einrichten' : 'Sicherheitscode eingeben'}</h1>
+        {mfaMode === 'setup' && !qrCode && (
+          <>
+            <p>Schütze deinen Mitarbeiterzugang mit einem zusätzlichen Sicherheitscode. Dein bisheriges Passwort bleibt gleich.</p>
+            <button className="auth-submit" type="button" disabled={busy} onClick={beginEnrollment}>
+              {busy ? 'QR-Code wird erstellt …' : 'QR-Code erstellen'}
+            </button>
+          </>
+        )}
+        {mfaMode === 'setup' && qrCode && (
+          <>
+            <p>Öffne Google Authenticator auf deinem Handy und scanne diesen QR-Code. Gib danach den sechsstelligen Code ein.</p>
+            <img src={qrCode} alt="QR-Code für die Einrichtung von Google Authenticator" style={{ display: 'block', width: 220, maxWidth: '100%', margin: '16px auto' }} />
+          </>
+        )}
+        {(mfaMode === 'verify' || Boolean(qrCode)) && (
+          <form onSubmit={confirmCode}>
+            <label htmlFor="mfa-code">Sechsstelliger Sicherheitscode</label>
+            <input id="mfa-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ''))} disabled={busy} />
+            <button className="auth-submit" type="submit" disabled={busy || code.length !== 6}>
+              {busy ? 'Wird geprüft …' : 'Code bestätigen'}
+            </button>
+          </form>
+        )}
+        {error && <p className="auth-error" role="alert">{error}</p>}
+        <button type="button" onClick={() => void supabase.auth.signOut()} style={{ marginTop: 18 }}>Abmelden</button>
+      </section>
+    </main>
+  );
+  if (user) return <div className="auth-page" role="status">Sicherheitsprüfung wird vorbereitet …</div>;
   return (
     <main className="auth-page">
       <section className="auth-card" aria-labelledby="login-title">
