@@ -121,7 +121,7 @@ export default function AuthGate() {
 
   const confirmCode = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (busy || !/^\\d{6}$/.test(code)) return;
+    if (busy || !/^\d{6}$/.test(code)) return;
     setBusy(true);
     setError('');
     try {
@@ -169,7 +169,7 @@ export default function AuthGate() {
         {(mfaMode === 'verify' || Boolean(qrCode)) && (
           <form onSubmit={confirmCode}>
             <label htmlFor="mfa-code">Sechsstelliger Sicherheitscode</label>
-            <input id="mfa-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={e => setCode(e.target.value.replace(/\\D/g, ''))} disabled={busy} />
+            <input id="mfa-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ''))} disabled={busy} />
             <button className="auth-submit" type="submit" disabled={busy || code.length !== 6}>
               {busy ? 'Wird geprüft …' : 'Code bestätigen'}
             </button>
