@@ -320,20 +320,7 @@ def create_app(config=None):
 
     @app.post('/api/files')
     def add_file():
-        data = payload()
-        name = text(data, 'name', 255, True)
-        mime_type = text(data, 'mime_type', 150) or 'application/octet-stream'
-        encoded = text(data, 'content', 2100000, True)
-        try:
-            content = base64.b64decode(encoded, validate=True)
-        except Exception:
-            abort(400, description='Datei konnte nicht gelesen werden.')
-        if not content or len(content) > 1500000:
-            abort(400, description='Die Datei darf höchstens 1,5 MB gross sein.')
-        identifier = str(uuid.uuid4())
-        db().execute('INSERT INTO internal_files(id,name,mime_type,size,content,uploaded_by) VALUES (?,?,?,?,?,?)', (identifier,name,mime_type,len(content),content,g.employee['email']))
-        db().commit()
-        return jsonify(id=identifier), 201
+        abort(403, description='Datei-Uploads sind im Sponti CRM aus Sicherheitsgründen deaktiviert.')
 
     @app.get('/api/files/<identifier>/download')
     def download_file(identifier):
