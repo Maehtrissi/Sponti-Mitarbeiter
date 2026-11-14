@@ -1,4 +1,5 @@
 import {useEffect, useState, type FormEvent, type ReactNode} from 'react';
+import {House, UsersRound, CalendarDays, PanelsTopLeft, Settings2, ChevronDown, Mail, LogOut} from 'lucide-react';
 import './crm.css';
 import {categories,isApprovedProvider,isProviderRequest} from './lib/crmMapping';
 import LegalStatus from './LegalStatus';
@@ -156,20 +157,40 @@ export default function IndependentCRM({request=serverApi,storageLabel='Eigene D
   const input = (key:keyof Contact,label:string,type='text',required=false) => <label>{label}<input type={type} value={editor?.[key] || ''} required={required} maxLength={key==='website_url'?2048:key==='location'?300:500} onChange={e=>setEditor(v=>v?{...v,[key]:e.target.value}:v)} /></label>;
   const select = (key:keyof Contact,label:string,options:string[]) => <label>{label}<select value={editor?.[key]||''} onChange={e=>setEditor(v=>v?{...v,[key]:e.target.value}:v)}>{options.map(o=><option key={o} value={o}>{o||'Keine Angabe'}</option>)}</select></label>;
   return <div className="crm workspace">
-    <aside><a className="brand" href="#" onClick={e=>{e.preventDefault();chooseTab('Übersicht');}}>Sponti<span className="brand-dot">.</span></a><p className="eyebrow">CRM · MITARBEITERBEREICH</p><nav className="nav-groups" aria-label="CRM-Hauptnavigation">
-  <button className={tab==='Übersicht'?'nav-primary active':'nav-primary'} onClick={()=>chooseTab('Übersicht')}>Übersicht</button>
-  {[
-    {id:'Kontakte',label:'Kontakte',items:[...(acquisitionSection?[['Akquise','Akquise']]:[]),['Kunden','Kunden'],['Kursanbieter','Kursanbieter'],['Anfragen','Anfragen'],['Archiv','Archiv']]},
-    {id:'Kurse',label:'Kurse',items:coursesSection?[['Kurse','Alle Kurse'],['Kurskalender','Kalender']]:[]},
-    {id:'Website',label:'Website',items:[...(reviewsSection?[['Bewertungen','Bewertungen']]:[]),...(newsSection?[['News-Board','News']]:[]),...(featuredCourseSection?[['Startseiten-Kurs','Startseiten-Kurs']]:[])]},
-    {id:'Verwaltung',label:'Verwaltung',items:[...(operationsSection?[['Kennzahlen','Kennzahlen']]:[]),['Aufgaben','Aufgaben'],[allowImport?'Datenübernahme':'Datenexport','Datenexport']]}
-  ].filter(group=>group.items.length>0).map(group=><div key={group.id} className="nav-compact-group">
-    <button type="button" className={`nav-primary nav-group-toggle ${expandedNav===group.id?'expanded':''} ${group.items.some(item=>item[0]===tab)?'active-parent':''}`} aria-expanded={expandedNav===group.id} aria-controls={`nav-${group.id}`} onClick={()=>setExpandedNav(expandedNav===group.id?null:group.id)}>
-      <span>{group.label}</span><span className="nav-chevron" aria-hidden="true">{expandedNav===group.id?'−':'+'}</span>
+    <aside className="sponti-crm-sidebar">
+  <div className="crm-sidebar-brand">
+    <a className="brand" href="#" aria-label="Sponti CRM – Übersicht" onClick={e=>{e.preventDefault();chooseTab('Übersicht');}}>Sponti<span className="brand-dot">.</span></a>
+    <p className="eyebrow">CRM · MITARBEITERBEREICH</p>
+  </div>
+  <nav className="nav-groups" aria-label="CRM-Hauptnavigation">
+    <button type="button" className={tab==='Übersicht'?'nav-primary nav-home active':'nav-primary nav-home'} aria-current={tab==='Übersicht'?'page':undefined} onClick={()=>chooseTab('Übersicht')}>
+      <House className="nav-icon" size={19} strokeWidth={1.8} aria-hidden="true"/><span className="nav-label">Übersicht</span>
     </button>
-    {expandedNav===group.id&&<div className="nav-compact-subitems" id={`nav-${group.id}`}>{group.items.map(([value,label])=><button type="button" key={value} className={tab===value?'nav-subitem active':'nav-subitem'} onClick={()=>chooseTab(value)}>{label}{value==='Kunden'&&<span>{customers.length}</span>}{value==='Kursanbieter'&&<span>{providers.length}</span>}{value==='Anfragen'&&pendingRequests.length>0&&<span>{pendingRequests.length}</span>}{value==='Aufgaben'&&openTasks.length>0&&<span>{openTasks.length}</span>}</button>)}</div>}
-  </div>)}
-</nav><div className="account"><small>{session.email}</small><button className="secondary" disabled={busy} onClick={()=>perform(async()=>{await api('logout',session.csrf,'POST',{});setSession(null);setContacts([]);setTasks([]);setSelected(null);setEditor(null);})}>Abmelden</button></div></aside>
+    {[
+      {id:'Kontakte',label:'Kontakte',Icon:UsersRound,items:[...(acquisitionSection?[['Akquise','Akquise']]:[]),['Kunden','Kunden'],['Kursanbieter','Kursanbieter'],['Anfragen','Anfragen'],['Archiv','Archiv']]},
+      {id:'Kurse',label:'Kurse',Icon:CalendarDays,items:coursesSection?[['Kurse','Alle Kurse'],['Kurskalender','Kalender']]:[]},
+      {id:'Website',label:'Website',Icon:PanelsTopLeft,items:[...(reviewsSection?[['Bewertungen','Bewertungen']]:[]),...(newsSection?[['News-Board','News']]:[]),...(featuredCourseSection?[['Startseiten-Kurs','Startseiten-Kurs']]:[])]},
+      {id:'Verwaltung',label:'Verwaltung',Icon:Settings2,items:[...(operationsSection?[['Kennzahlen','Kennzahlen']]:[]),['Aufgaben','Aufgaben'],[allowImport?'Datenübernahme':'Datenexport','Datenexport']]}
+    ].filter(group=>group.items.length>0).map(group=><div key={group.id} className="nav-compact-group">
+      <button type="button" className={`nav-primary nav-group-toggle ${expandedNav===group.id?'expanded':''} ${group.items.some(item=>item[0]===tab)?'active-parent':''}`} aria-expanded={expandedNav===group.id} aria-controls={`nav-${group.id}`} onClick={()=>setExpandedNav(expandedNav===group.id?null:group.id)}>
+        <group.Icon className="nav-icon" size={19} strokeWidth={1.8} aria-hidden="true"/>
+        <span className="nav-label">{group.label}</span>
+        <ChevronDown className="nav-chevron" size={18} strokeWidth={1.8} aria-hidden="true"/>
+      </button>
+      {expandedNav===group.id&&<div className="nav-compact-subitems" id={`nav-${group.id}`}>{group.items.map(([value,label])=><button type="button" key={value} className={tab===value?'nav-subitem active':'nav-subitem'} aria-current={tab===value?'page':undefined} onClick={()=>chooseTab(value)}>
+        <span className="subnav-label">{label}</span>
+        {value==='Kunden'&&customers.length>0&&<span className="nav-count">{customers.length}</span>}
+        {value==='Kursanbieter'&&providers.length>0&&<span className="nav-count">{providers.length}</span>}
+        {value==='Anfragen'&&pendingRequests.length>0&&<span className="nav-count nav-count-alert">{pendingRequests.length}</span>}
+        {value==='Aufgaben'&&openTasks.length>0&&<span className="nav-count nav-count-alert">{openTasks.length}</span>}
+      </button>)}</div>}
+    </div>)}
+  </nav>
+  <div className="account">
+    <div className="crm-sidebar-account-email"><Mail size={15} strokeWidth={1.8} aria-hidden="true"/><small title={session.email}>{session.email}</small></div>
+    <button className="secondary crm-sidebar-logout" disabled={busy} onClick={()=>perform(async()=>{await api('logout',session.csrf,'POST',{});setSession(null);setContacts([]);setTasks([]);setSelected(null);setEditor(null);})}><LogOut size={16} strokeWidth={1.8} aria-hidden="true"/> Abmelden</button>
+  </div>
+</aside>
     <main><header><div><p className="eyebrow">SPONTI CRM</p><h1>{tab}</h1><p className="workspace-description">{({Übersicht:'Hier verwaltest du Kurse, Buchungen, Anbieter und die nächsten Schritte.',Kunden:'Kundenkontakte, Interessen und Kontaktkanäle im Überblick.',Kursanbieter:'Deine Partner, Angebote und die Zusammenarbeit an einem Ort.',Anfragen:'Neue Anbieter kennenlernen und die Zusammenarbeit vorbereiten.',Kurse:'Kurse, Termine und freie Plätze verwalten.',Kurskalender:'Alle Kurstermine im Monatskalender.',Akquise:'Potenzielle Kursanbieter und Kontakte organisieren.',Kennzahlen:'Kennzahlen, Buchungen und Hinweise im Blick.',Aufgaben:'Behalte deine nächsten Schritte und Fälligkeiten im Blick.',Archiv:'Archivierte Kontakte ansehen und bei Bedarf wiederherstellen.',Bewertungen:'Erfahrungsberichte prüfen, beantworten und löschen.','News-Board':'Aktuelle Meldungen auf der Sponti-Startseite verwalten.','Startseiten-Kurs':'Wähle den hervorgehobenen Kurs auf der Startseite.','Datenexport':'Deine CRM-Daten sicher exportieren.','Datenübernahme':'Bestehende Kontakte in dein CRM übernehmen.'} as Record<string,string>)[tab]}</p></div><span className="connection">● {storageLabel}</span></header>
       {error && <div role="alert" className="error">{error}</div>}{notice && <div role="status" className="notice">{notice}</div>}
       {tab==='Übersicht' && <><div className="stats">{[['Kunden',customers.length],['Kursanbieter',providers.length],['Offene Anfragen',pendingRequests.length],['Offene Aufgaben',openTasks.length]].map(([title,count])=><article key={title}><span>{title}</span><strong>{count}</strong></article>)}</div><GuestCourseRequests/><div className="split"><section className="panel"><h2>Offene Aufgaben</h2>{openTasks.length===0?<p className="muted">Alles erledigt. Erstelle eine Aufgabe für deinen nächsten Kontakt.</p>:openTasks.slice(0,6).map(t=><div className="task" key={t.id}><div><strong>{t.title}</strong><small>{t.contact_name||'Allgemein'} · {date(t.due_date)}</small></div><button className="secondary" onClick={()=>chooseTab('Aufgaben')}>Ansehen →</button></div>)}<button onClick={()=>{chooseTab('Aufgaben');setTaskForm(true);}}>Aufgabe erstellen</button></section><section className="panel"><h2>Anbieter zur Prüfung</h2>{pendingRequests.length===0?<p className="muted">Keine offenen Anfragen. Neue Unternehmen erscheinen hier, sobald sie das Formular ausfüllen.</p>:pendingRequests.slice(0,5).map(c=><button className="contact-row" key={c.id} onClick={()=>setSelected(c)}><span><strong>{c.company||c.name}</strong><small>{c.name} · {c.interest||'Keine Kategorie'}</small></span><span className="badge">{c.status}</span></button>)}</section></div></>}
