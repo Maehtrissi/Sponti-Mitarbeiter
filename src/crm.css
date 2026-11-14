@@ -259,3 +259,153 @@
  .crm .nav-compact-subitems{padding-left:8px;margin-left:9px}
  .crm .nav-groups .nav-primary{white-space:normal}
 }
+
+
+/* Sponti CRM — refined sidebar branding and navigation, November 2026 */
+.crm.workspace aside.sponti-crm-sidebar{
+  width:272px;
+  padding:32px 21px 20px;
+  background:
+    radial-gradient(ellipse 280px 240px at 110% -4%,rgba(89,148,113,.16),transparent 77%),
+    radial-gradient(ellipse 220px 270px at -30% 76%,rgba(66,126,92,.14),transparent 80%),
+    linear-gradient(165deg,#103e30 0%,#092f25 64%,#082e24 100%);
+  color:#f6f5ee;
+  border-right:1px solid rgba(255,255,255,.07);
+  box-shadow:4px 0 22px rgba(10,48,35,.06);
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(205,226,210,.35) transparent;
+}
+.crm.workspace aside .crm-sidebar-brand{padding:0 10px 25px}
+.crm.workspace aside .crm-sidebar-brand .brand{
+  display:inline-block;margin:0;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:43px;line-height:1.08;font-style:italic;
+  font-weight:700;letter-spacing:-2.1px;color:#fffaf2;
+  text-decoration:none;
+}
+.crm.workspace aside .crm-sidebar-brand .brand-dot{
+  color:#f58a43;font-style:normal;font-family:Georgia,serif;
+  margin-left:0;letter-spacing:-2px;
+}
+.crm.workspace aside .crm-sidebar-brand .eyebrow{
+  margin:13px 0 0;color:#b6d0c0;
+  font-size:9px;letter-spacing:2.25px;font-weight:700;line-height:1.5;
+}
+.crm.workspace aside .nav-groups{
+  display:flex;flex-direction:column;align-items:stretch;
+  gap:6px;padding:0;margin:0;overflow:visible;
+}
+.crm.workspace aside .nav-compact-group{display:flex;flex-direction:column;gap:2px;margin:0;min-width:0}
+.crm.workspace aside .nav-compact-group+.nav-compact-group{border-top:1px solid rgba(230,241,231,.12);padding-top:13px;margin-top:7px}
+.crm.workspace aside .nav-groups .nav-primary{
+  display:flex;justify-content:flex-start;align-items:center;gap:13px;
+  width:100%;padding:13px 12px;min-height:46px;
+  border:0;border-radius:12px;
+  background:transparent;box-shadow:none;
+  font-size:14px;line-height:1.35;font-weight:650;
+  text-align:left;color:#eff3ec;
+  white-space:normal;
+}
+.crm.workspace aside .nav-groups .nav-primary:hover,
+.crm.workspace aside .nav-groups .nav-group-toggle.expanded:hover{
+  background:rgba(240,255,241,.085);color:#fff;
+}
+.crm.workspace aside .nav-groups .nav-home.active{
+  position:relative;overflow:hidden;
+  background:rgba(195,227,207,.20);
+  box-shadow:inset 0 0 0 1px rgba(225,246,230,.04);
+  font-weight:700;color:white;
+}
+.crm.workspace aside .nav-groups .nav-home.active::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:#f58b47;border-radius:12px;
+}
+.crm.workspace aside .nav-groups .nav-icon{
+  flex:none;color:#e2efe3;background:transparent!important;
+  padding:0!important;border-radius:0!important;
+}
+.crm.workspace aside .nav-groups .nav-label{flex:1;min-width:0;background:transparent!important;color:inherit!important;border-radius:0!important;padding:0!important;font:inherit!important}
+.crm.workspace aside .nav-groups .nav-chevron{
+  flex:none;width:18px;height:18px;margin-left:auto;
+  color:#d7e8d9;background:transparent!important;padding:0!important;border-radius:0!important;
+  transform:rotate(0deg);transition:transform .18s ease;
+}
+.crm.workspace aside .nav-groups .expanded .nav-chevron{transform:rotate(180deg)}
+.crm.workspace aside .nav-groups .active-parent:not(.expanded){
+  box-shadow:none;color:#fff;
+}
+.crm.workspace aside .nav-compact-subitems{
+  display:flex;flex-direction:column;gap:2px;
+  margin:0 0 12px 20px;padding:4px 0 4px 15px;
+  border-left:1px solid rgba(191,220,199,.28);
+}
+.crm.workspace aside .nav-compact-subitems .nav-subitem{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;min-height:37px;padding:8px 10px;
+  border-radius:9px;background:transparent;box-shadow:none;
+  color:#c8ddce;font-size:13px;line-height:1.35;font-weight:500;
+  text-align:left;opacity:1;white-space:normal;
+}
+.crm.workspace aside .nav-compact-subitems .nav-subitem:hover{background:rgba(255,255,255,.08);color:white}
+.crm.workspace aside .nav-compact-subitems .nav-subitem.active{background:rgba(228,247,231,.12);color:#fff;font-weight:700}
+.crm.workspace aside .nav-compact-subitems .subnav-label{
+  background:transparent!important;color:inherit!important;padding:0!important;
+  border-radius:0!important;min-width:0;font:inherit!important;
+}
+.crm.workspace aside .nav-compact-subitems .nav-count{
+  flex:none;display:inline-flex;align-items:center;justify-content:center;
+  min-width:24px;height:23px;padding:2px 7px;
+  background:rgba(247,151,81,.17);color:#ffd4ae;
+  font-size:11px;line-height:1;font-weight:700;border-radius:8px;
+}
+.crm.workspace aside .nav-compact-subitems .nav-count-alert{background:#ed823d;color:#fff}
+.crm.workspace aside .account{
+  margin-top:auto;padding:20px 4px 0;
+  border-top:1px solid rgba(225,240,227,.18);
+  display:flex;flex-direction:column;align-items:stretch;gap:13px;
+}
+.crm.workspace aside .crm-sidebar-account-email{display:flex;align-items:center;gap:10px;min-width:0;color:#bbd3c5}
+.crm.workspace aside .crm-sidebar-account-email svg{flex:none}
+.crm.workspace aside .crm-sidebar-account-email small{
+  display:block;min-width:0;margin:0;overflow-wrap:anywhere;
+  font-size:12px;color:#bbd3c5;line-height:1.5;
+}
+.crm.workspace aside .account .crm-sidebar-logout{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;min-height:43px;padding:10px 13px;
+  background:rgba(255,255,255,.055);color:#f4f8f1;
+  border:1px solid rgba(212,237,218,.29);border-radius:12px;
+  font-size:13px;font-weight:650;
+}
+.crm.workspace aside .account .crm-sidebar-logout:hover{
+  background:rgba(255,255,255,.13);border-color:rgba(237,249,240,.55)
+}
+.crm.workspace main{margin-left:272px;width:calc(100% - 272px)}
+@media(max-width:1000px) and (min-width:761px){
+  .crm.workspace aside.sponti-crm-sidebar{width:236px;padding:25px 14px 17px}
+  .crm.workspace aside .crm-sidebar-brand .brand{font-size:38px}
+  .crm.workspace aside .crm-sidebar-brand .eyebrow{font-size:8px;letter-spacing:1.7px}
+  .crm.workspace main{margin-left:236px;width:calc(100% - 236px)}
+}
+@media(max-width:760px){
+  .crm.workspace aside.sponti-crm-sidebar{
+    position:relative;inset:auto;width:100%;max-height:none;
+    padding:19px 16px 14px;overflow:visible;
+  }
+  .crm.workspace aside .crm-sidebar-brand{padding:0 2px 12px}
+  .crm.workspace aside .crm-sidebar-brand .brand{font-size:33px;margin:0;display:inline-block}
+  .crm.workspace aside .crm-sidebar-brand .eyebrow{display:block;margin:6px 0 0;font-size:8px;letter-spacing:1.5px}
+  .crm.workspace aside .nav-groups{display:flex;flex-direction:column;gap:2px;overflow:visible;padding:0}
+  .crm.workspace aside .nav-groups .nav-primary{min-height:42px;padding:10px 12px;font-size:13px}
+  .crm.workspace aside .nav-compact-group{display:flex;flex-direction:column;flex:none;gap:0}
+  .crm.workspace aside .nav-compact-group+.nav-compact-group{padding-top:7px;margin-top:3px}
+  .crm.workspace aside .nav-compact-subitems{margin-bottom:6px}
+  .crm.workspace aside .account{display:flex;align-items:stretch;margin:12px 0 0;padding:12px 2px 0;gap:10px}
+  .crm.workspace aside .account .crm-sidebar-logout{width:100%}
+  .crm.workspace main{margin:0;width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .crm.workspace aside .nav-groups .nav-chevron{transition:none}
+}
