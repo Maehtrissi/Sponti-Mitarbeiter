@@ -243,3 +243,19 @@
 @media(max-width:1000px){.crm.workspace main{padding:26px 20px 48px}.crm.workspace .stats{grid-template-columns:repeat(2,minmax(0,1fr))}.crm.workspace .split{grid-template-columns:1fr}}
 @media(max-width:760px){.crm.workspace aside{width:100%;position:relative;inset:auto;max-height:none;overflow:visible;padding:14px 16px}.crm.workspace aside .brand{font-size:29px;display:inline-block;margin:0 10px 4px}.crm.workspace aside>.eyebrow{display:none}.crm.workspace .nav-groups{display:flex;gap:8px;overflow-x:auto;padding:8px 0;scrollbar-width:thin}.crm.workspace .nav-group{display:flex;gap:5px;flex:0 0 auto}.crm.workspace .nav-heading{display:none}.crm.workspace aside nav button{white-space:nowrap;padding:10px 12px;min-height:38px}.crm.workspace aside .account{margin:6px 0 0;padding:8px 0 0;display:flex;justify-content:space-between;align-items:center;gap:12px}.crm.workspace aside .account button{width:auto}.crm.workspace main{margin:0;width:100%;padding:23px 16px 44px}.crm.workspace main>header{flex-wrap:wrap}.crm.workspace .panel{padding:19px}.crm.workspace .stats article{min-height:120px;padding:19px}.crm.workspace .stats article strong{font-size:30px}}
 @media(max-width:420px){.crm.workspace .stats{gap:9px}.crm.workspace .stats article{padding:15px;min-height:111px}.crm.workspace .stats article span{font-size:12px}.crm.workspace .stats article strong{font-size:27px}.crm.workspace .stats article:before{right:9px;top:9px;width:28px;height:28px}.crm.workspace .stats article:after{right:18px;top:18px;width:10px;height:10px}.crm.workspace .connection{white-space:normal}}
+
+/* Compact CRM navigation: five primary destinations, subordinate links on demand. */
+.crm .nav-groups{display:flex;flex-direction:column;gap:7px}
+.crm .nav-compact-group{display:flex;flex-direction:column;gap:3px;min-width:0}
+.crm .nav-groups .nav-primary{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;font-weight:700;border-radius:12px;padding:12px 13px}
+.crm .nav-groups .nav-group-toggle.active-parent:not(.expanded){box-shadow:inset 3px 0 0 #f08c64}
+.crm .nav-groups .nav-chevron{font-size:18px;line-height:1;font-weight:500;opacity:.75}
+.crm .nav-compact-subitems{display:flex;flex-direction:column;gap:3px;padding:3px 0 8px 10px;margin-left:12px;border-left:1px solid rgba(154,166,149,.35)}
+.crm .nav-compact-subitems .nav-subitem{width:100%;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;font-size:13px;opacity:.95;border-radius:9px}
+.crm .nav-compact-subitems .nav-subitem.active{opacity:1}
+@media(max-width:650px){
+ .crm .nav-groups{display:flex;flex-direction:column;gap:6px;width:100%}
+ .crm .nav-compact-group{display:flex;flex-direction:column}
+ .crm .nav-compact-subitems{padding-left:8px;margin-left:9px}
+ .crm .nav-groups .nav-primary{white-space:normal}
+}
