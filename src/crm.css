@@ -535,3 +535,5 @@
 .crm.workspace button.close{height:32px;width:32px;padding:0;background:#f1f4f1;color:var(--v3-muted);border:0;border-radius:50%}
 .crm.workspace button.close:hover:not(:disabled){background:#e4e9e4;color:var(--v3-ink)}
 .crm.workspace .task{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+.crm.workspace .subtabs button.active:hover:not(:disabled){background:#fff;color:var(--v3-ink)}
+.crm.workspace .detail-tabs button.active:hover:not(:disabled){background:#fff;color:var(--v3-ink)}
