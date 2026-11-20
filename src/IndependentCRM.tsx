@@ -155,8 +155,8 @@ export default function IndependentCRM({request=serverApi,storageLabel='Eigene D
       setNotice(`„${name}“ wurde endgültig aus dem CRM gelöscht.`);
     });
   }
-  const input = (key:keyof Contact,label:string,type='text',required=false) => <label>{label}<input type={type} value={editor?.[key] || ''} required={required} maxLength={key==='website_url'?2048:key==='location'?300:500} onChange={e=>setEditor(v=>v?{...v,[key]:e.target.value}:v)} /></label>;
-  const select = (key:keyof Contact,label:string,options:string[]) => <label>{label}<select value={editor?.[key]||''} onChange={e=>setEditor(v=>v?{...v,[key]:e.target.value}:v)}>{options.map(o=><option key={o} value={o}>{o||'Keine Angabe'}</option>)}</select></label>;
+  const input = (key:keyof Contact,label:string,type='text',required=false) => <label>{label}<input type={type} value={String(editor?.[key] || '')} required={required} maxLength={key==='website_url'?2048:key==='location'?300:500} onChange={e=>setEditor(v=>v?{...v,[key]:e.target.value}:v)} /></label>;
+  const select = (key:keyof Contact,label:string,options:string[]) => <label>{label}<select value={String(editor?.[key]||'')} onChange={e=>setEditor(v=>v?{...v,[key]:e.target.value}:v)}>{options.map(o=><option key={o} value={o}>{o||'Keine Angabe'}</option>)}</select></label>;
   return <div className="crm workspace">
     <aside className="sponti-crm-sidebar">
   <div className="crm-sidebar-brand">
