@@ -33,21 +33,21 @@ export default function CoursesCRM({initialProviderId='',openNew=false,assignExi
  async function perform(action:()=>Promise<void>){setBusy(true);setError('');setNotice('');try{await action();}catch(e){setError(e instanceof Error?e.message:'Kurs konnte nicht gespeichert werden.');}finally{setBusy(false);}}
  async function save(e:FormEvent){e.preventDefault();if(!editor)return;await perform(async()=>{
   const payload=coursePayload(editor) as TablesInsert<'courses'>;
-  if(payload.provider_id&&payload.status==='published'&&!providers.some(p=>p.id===payload.provider_id&&p.crm_status==='Partner'&&!p.archived_at))throw new Error('Zum Veröffentlichen muss der zugeordnete Anbieter bestätigt und aktiv sein.');
+  if(payload.provider_id&&payload.status==='published'&&!providers.some(p=>p.id===payload.provider_id&&p.crm_status==='Live'&&!p.archived_at))throw new Error('Zum Veröffentlichen muss der zugeordnete Anbieter den Status Live haben.');
   const r=editor.id?await supabase.from('courses').update(payload).eq('id',editor.id).select('id').single():await supabase.from('courses').insert(payload).select('id').single();
   if(r.error)throw r.error;await reload();setEditor(null);setNotice(payload.status==='published'?'Kurs gespeichert. Er erscheint auf der Website, solange der Termin bevorsteht und Plätze frei sind.':'Kurs als Entwurf gespeichert.');
  });}
  function edit(c:Course){setError('');setNotice('');setEditor({...c,starts_at:toLocalInput(c.starts_at),price:String(c.price),seats:String(c.seats),provider_id:c.provider_id||''});}
  async function change(c:Course,action:'publish'|'unpublish'|'archive'|'restore'){
   if(action==='publish'&&(new Date(c.starts_at).getTime()<=Date.now()||c.seats===0)){setError('Zum Veröffentlichen braucht der Kurs einen zukünftigen Termin und freie Plätze.');return;}
-  if(action==='publish'&&c.provider_id&&!providers.some(p=>p.id===c.provider_id&&p.crm_status==='Partner'&&!p.archived_at)){setError('Bestätige zuerst den Anbieter oder ordne den Kurs einem aktiven Anbieter zu.');return;}
+  if(action==='publish'&&c.provider_id&&!providers.some(p=>p.id===c.provider_id&&p.crm_status==='Live'&&!p.archived_at)){setError('Setze zuerst den Anbieter auf Live oder ordne den Kurs einem Live-Anbieter zu.');return;}
   if(action==='publish'&&!window.confirm(`„${c.title}“ auf der Website veröffentlichen?`))return;
   if(action==='archive'&&!window.confirm(`„${c.title}“ löschen? Der Kurs wird archiviert und von der Website entfernt.`))return;
   await perform(async()=>{const update=action==='publish'?{status:'published'}:action==='unpublish'?{status:'draft'}:action==='archive'?{archived_at:new Date().toISOString(),status:'draft'}:{archived_at:null,status:'draft'};
    const r=await supabase.from('courses').update(update).eq('id',c.id).select('id').single();if(r.error)throw r.error;await reload();setNotice(action==='archive'?'Kurs archiviert.':action==='restore'?'Kurs als Entwurf wiederhergestellt.':action==='publish'?'Kurs veröffentlicht.':'Kurs wieder als Entwurf gespeichert.');
   });
  }
- const approvedProviders=providers.filter(p=>p.crm_status==='Partner'&&!p.archived_at);
+ const approvedProviders=providers.filter(p=>['Partner','Live'].includes(p.crm_status)&&!p.archived_at);
  const selectedProvider=providers.find(p=>p.id===providerFilter);
  const assignmentProvider=approvedProviders.find(p=>p.id===initialProviderId);
  const providerName=(id:string|null)=>providers.find(p=>p.id===id)?.company||(id?'Bisheriger Anbieter':'Noch nicht zugeordnet');

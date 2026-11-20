@@ -36,8 +36,8 @@ export function contactPayload(contact:CRMContact, creating=false):Record<string
 }
 
 export function isApprovedProvider(contact:CRMContact) {
-  return contact.kind==='provider' && !contact.archived_at && contact.status==='Partner';
+  return contact.kind==='provider' && !contact.archived_at && ['Partner','Live'].includes(contact.status);
 }
 export function isProviderRequest(contact:CRMContact) {
-  return contact.kind==='provider' && !contact.archived_at && contact.status!=='Partner';
+  return contact.kind==='provider' && !contact.archived_at && !['Partner','Live'].includes(contact.status);
 }

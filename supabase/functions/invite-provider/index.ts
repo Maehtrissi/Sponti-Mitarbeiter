@@ -22,7 +22,7 @@ Deno.serve(async(req)=>{
   const providerId=String(body.provider_id||"");
   const {data:provider,error:providerError}=await admin.from("Kursanbieter").select("id,company,contact,email,phone,location,website_url,category,crm_status,archived_at").eq("id",providerId).maybeSingle();
   if(providerError||!provider||provider.archived_at) return json({error:"Anbieter nicht gefunden."},404);
-  if(provider.crm_status!=="Partner") return json({error:"Der Anbieter muss zuerst als Partner bestätigt werden."},400);
+  if(!["Partner","Live"].includes(provider.crm_status)) return json({error:"Der Anbieter muss zuerst als Partner bestätigt werden."},400);
   const {data:existing,error:existingError}=await admin.rpc("crm_provider_account_admin",{p_action:"by_provider",p_provider_id:providerId});
   if(existingError) return json({error:"Anbieterzuordnung konnte nicht geprüft werden."},500);
   if(existing?.user_id){
