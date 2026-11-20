@@ -67,3 +67,12 @@ begin
   return new;
 end;
 $function$;
+
+create or replace function public.sponti_checkout_connect_account(p_course_id uuid) returns text
+language sql security definer stable set search_path='' as $$
+  select a.stripe_account_id from public.courses c
+  join private.sponti_connect_accounts a on a.provider_id=c.provider_id and a.mode='test'
+  where c.id=p_course_id limit 1
+$$;
+revoke all on function public.sponti_checkout_connect_account(uuid) from public, anon, authenticated;
+grant execute on function public.sponti_checkout_connect_account(uuid) to service_role;

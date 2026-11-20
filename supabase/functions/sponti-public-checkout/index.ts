@@ -21,10 +21,9 @@ Deno.serve(async req=>{
  const db=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,{auth:{persistSession:false,autoRefreshToken:false}});
  // Aufteilung bei der Zahlung: der Anbieter braucht ein verbundenes Stripe-Konto, das Zahlungen empfangen darf.
  const unavailable=()=>json({error:"Für diesen Kurs ist die Online-Zahlung noch nicht freigeschaltet."},409,origin);
- const {data:course}=await db.from("courses").select("provider_id").eq("id",body.course_id).maybeSingle();
- if(!course?.provider_id)return unavailable();
- const {data:account}=await db.schema("private").from("sponti_connect_accounts").select("stripe_account_id").eq("provider_id",course.provider_id).eq("mode","test").maybeSingle();
- if(!account?.stripe_account_id)return unavailable();
+ const {data:connectId}=await db.rpc("sponti_checkout_connect_account",{p_course_id:body.course_id});
+ const account={stripe_account_id:typeof connectId==="string"&&/^acct_[A-Za-z0-9]+$/.test(connectId)?connectId:""};
+ if(!account.stripe_account_id)return unavailable();
  const acct=await fetch("https://api.stripe.com/v1/accounts/"+encodeURIComponent(account.stripe_account_id),{headers:{authorization:"Bearer "+secret},signal:AbortSignal.timeout(10000)}).then(r=>r.ok?r.json():null).catch(()=>null);
  if(!acct||acct.capabilities?.transfers!=="active"||!acct.payouts_enabled)return unavailable();
  const {data:reserved,error:reserveError}=await db.rpc("sponti_reserve_paid_checkout",{p_course_id:body.course_id,p_quantity:body.quantity,p_guest_name:body.guest_name,p_guest_email:body.guest_email,p_guest_phone:body.guest_phone});
