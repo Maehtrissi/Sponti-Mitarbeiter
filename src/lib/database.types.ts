@@ -429,6 +429,9 @@ export type Database = {
       }
       Kursanbieter: {
         Row: {
+          agb_accepted: boolean | null
+          agb_accepted_at: string | null
+          agb_version: string | null
           archived_at: string | null
           category: string
           company: string
@@ -445,6 +448,9 @@ export type Database = {
           website_url: string
         }
         Insert: {
+          agb_accepted?: boolean | null
+          agb_accepted_at?: string | null
+          agb_version?: string | null
           archived_at?: string | null
           category: string
           company: string
@@ -461,6 +467,9 @@ export type Database = {
           website_url?: string
         }
         Update: {
+          agb_accepted?: boolean | null
+          agb_accepted_at?: string | null
+          agb_version?: string | null
           archived_at?: string | null
           category?: string
           company?: string

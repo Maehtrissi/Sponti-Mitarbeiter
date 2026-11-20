@@ -6,7 +6,7 @@ import LegalStatus from './LegalStatus';
 import CRMProfileEditor from './CRMProfileEditor';
 import GuestCourseRequests from './GuestCourseRequests';
 
-type Contact = {id: string; kind: 'customer'|'provider'; name: string; email: string; phone: string; company: string; interest: string; channel: string; offer_type: string; status: string; message: string; source: string; created_at: string; archived_at?:string|null; website_url?:string;location?:string};
+type Contact = {id: string; kind: 'customer'|'provider'; name: string; email: string; phone: string; company: string; interest: string; channel: string; offer_type: string; status: string; message: string; source: string; created_at: string; archived_at?:string|null; website_url?:string;location?:string;agb_accepted?:boolean|null;agb_accepted_at?:string|null;agb_version?:string|null};
 type ProviderCourse={id:string;title:string;starts_at:string;venue:string;status:string};
 type CourseContext={providerId?:string;create?:boolean;assign?:boolean};
 type Note = {id:string; body:string; author:string; created_at:string};
@@ -17,6 +17,7 @@ const contactFilterFields:Record<'customer'|'provider',Array<{key:keyof Contact;
  customer:[{key:'name',label:'Name'},{key:'email',label:'E-Mail'},{key:'phone',label:'Telefon'},{key:'interest',label:'Interessen'},{key:'channel',label:'Kontaktkanal'},{key:'status',label:'Status'},{key:'source',label:'Quelle'},{key:'location',label:'Standort'},{key:'company',label:'Unternehmen'},{key:'message',label:'Notiz / Nachricht'},{key:'created_at',label:'Erstellt am'},{key:'id',label:'Kontakt-ID'}],
  provider:[{key:'company',label:'Unternehmen'},{key:'name',label:'Kontaktperson'},{key:'email',label:'E-Mail'},{key:'phone',label:'Telefon'},{key:'location',label:'Standort'},{key:'website_url',label:'Website'},{key:'offer_type',label:'Kursangebot'},{key:'interest',label:'Kategorie / Interesse'},{key:'status',label:'Status'},{key:'channel',label:'Kontaktkanal'},{key:'source',label:'Quelle'},{key:'message',label:'Notiz / Nachricht'},{key:'created_at',label:'Erstellt am'},{key:'id',label:'Kontakt-ID'}]
 };
+const agbLabel=(c:Contact)=>c.agb_accepted===true?`Ja${c.agb_accepted_at?' · '+new Date(c.agb_accepted_at).toLocaleDateString('de-CH'):''}${c.agb_version?' · Version '+c.agb_version:''}`:c.agb_accepted===false?'Nein':'Nicht erfasst';
 const blank = (kind:Contact['kind']):Contact => ({id:'',kind,name:'',email:'',phone:'',company:'',interest:'',channel:'',offer_type:'',status:statuses[kind][0],message:'',source:'CRM',created_at:''});
 export type CRMRequest = <T>(path:string, csrf?:string, method?:string, data?:unknown)=>Promise<T>;
 async function serverApi<T>(path:string, csrf='', method='GET', data?:unknown):Promise<T> {
@@ -210,7 +211,7 @@ export default function IndependentCRM({request=serverApi,storageLabel='Eigene D
 <div className="detail-summary-grid">{[
  {title:'Kontakt',rows:[...(selected.kind==='provider'?[['Ansprechperson',selected.name]]:[]),['E-Mail',selected.email],['Telefon',selected.phone],...(selected.kind==='provider'?[['Standort',selected.location||'']]:[])]},
  {title:selected.kind==='customer'?'Interessen & Kursinfos':'Angebot & Zusammenarbeit',rows:selected.kind==='customer'?[['Interessen',selected.interest],['Kursinfos über',selected.channel]]:[['Kategorie',selected.interest],['Kursangebot',selected.offer_type]]},
- {title:'CRM-Verwaltung',rows:[['Status',selected.status],['Quelle',selected.source],['Erfasst am',date(selected.created_at)]]}
+ {title:'CRM-Verwaltung',rows:[['Status',selected.status],['Quelle',selected.source],['Erfasst am',date(selected.created_at)],...(selected.kind==='provider'?[['AGB akzeptiert',agbLabel(selected)]]:[])]}
 ].map(group=><section className="detail-summary-card" key={group.title}><h3>{group.title}</h3><dl>{group.rows.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value||'Nicht angegeben'}</dd></div>)}</dl></section>)}</div>
 {selected.message&&<section className="detail-message"><h3>Nachricht aus der Anmeldung</h3><p>{selected.message}</p></section>}
 </div>
