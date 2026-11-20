@@ -588,3 +588,7 @@
 .crm.workspace tbody tr:hover td{background:#fbfaf6}
 .crm.workspace .status-pill,.crm.workspace .badge{height:24px;font-size:12px}
 @media(max-width:760px){.crm.workspace main{margin-left:0;width:100%}.crm.workspace aside.sponti-crm-sidebar{width:100%}}
+/* v4 – Korrekturen: Abmelden sichtbar, Pfeile kräftiger */
+.crm.workspace aside.sponti-crm-sidebar .account button,.crm.workspace aside.sponti-crm-sidebar .crm-sidebar-logout{background:#fff!important;color:var(--v3-ink)!important;border:1px solid var(--v3-line)!important;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
+.crm.workspace aside.sponti-crm-sidebar .account button:hover:not(:disabled){background:#f3f1ea!important}
+.crm.workspace aside.sponti-crm-sidebar .nav-chevron{color:#7d8d84;opacity:1}
