@@ -409,3 +409,118 @@
 @media(prefers-reduced-motion:reduce){
   .crm.workspace aside .nav-groups .nav-chevron{transition:none}
 }
+
+/* ==========================================================================
+   Sponti CRM v3 – ruhiges, übersichtliches Arbeitsdesign (November 2026)
+   Gilt für alle Seiten. Steht bewusst am Ende und überschreibt ältere Regeln.
+   ========================================================================== */
+.crm.workspace{
+  --v3-bg:#f4f6f3;--v3-card:#fff;--v3-line:#e3e9e4;--v3-line-soft:#eef2ee;
+  --v3-ink:#17302a;--v3-muted:#6a7c73;--v3-brand:#1f4d3b;--v3-brand-hover:#173d2e;
+  --v3-accent:#e58a4b;--v3-ok-bg:#e5f3e8;--v3-ok:#23703d;--v3-warn-bg:#fdf1dc;--v3-warn:#8a5a0b;
+  --v3-off-bg:#eef0ee;--v3-off:#5d6b64;--v3-bad-bg:#fbe8e4;--v3-bad:#a03a27;
+  background:var(--v3-bg);color:var(--v3-ink);font-size:14px;line-height:1.55;
+}
+/* Seitenkopf: kompakt, ohne doppelte Beschriftung */
+.crm.workspace main{padding:28px clamp(20px,3vw,48px) 56px;max-width:1500px}
+.crm.workspace main>header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 22px;padding:0 0 18px;border-bottom:1px solid var(--v3-line)}
+.crm.workspace main>header .eyebrow{display:none}
+.crm.workspace main>header h1{font-size:26px;font-weight:700;letter-spacing:-.6px;line-height:1.2;margin:0}
+.crm.workspace main>header .workspace-description{margin:4px 0 0;font-size:13px;color:var(--v3-muted);max-width:70ch}
+.crm.workspace .connection{background:transparent;border:0;color:var(--v3-muted);font-size:12px;padding:0;font-weight:500}
+/* Karten und Flächen */
+.crm.workspace .panel,.crm.workspace .stats article{background:var(--v3-card);border:1px solid var(--v3-line);border-radius:14px;box-shadow:none}
+.crm.workspace .panel{padding:20px 22px;margin-bottom:18px}
+.crm.workspace .panel h2{font-size:17px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px}
+.crm.workspace .panel .muted,.crm.workspace .panel>p{color:var(--v3-muted);font-size:13px}
+/* Kennzahlen ohne Deko-Kreise */
+.crm.workspace .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.crm.workspace .stats article{padding:16px 18px;min-height:0;display:flex;flex-direction:column;gap:2px}
+.crm.workspace .stats article:before,.crm.workspace .stats article:after{display:none!important;content:none!important}
+.crm.workspace .stats article span{font-size:12px;font-weight:600;color:var(--v3-muted);text-transform:none}
+.crm.workspace .stats article strong{font-size:30px;font-weight:700;letter-spacing:-1px;color:var(--v3-ink);margin:0;line-height:1.15}
+.crm.workspace .split{gap:18px}
+/* Werkzeugleiste: Suche links, Aktionen rechts */
+.crm.workspace .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px;padding:0;border:0}
+.crm.workspace .toolbar>div:first-child{flex:1 1 280px;min-width:0}
+.crm.workspace .toolbar>input,.crm.workspace .toolbar>select{height:38px;border:1px solid var(--v3-line);border-radius:9px;background:#fff;padding:0 12px;font-size:13px;color:var(--v3-ink)}
+.crm.workspace .toolbar>input{flex:1 1 260px;min-width:200px}
+.crm.workspace .toolbar>select{flex:0 0 auto;min-width:150px;max-width:230px}
+.crm.workspace .toolbar input:focus,.crm.workspace .toolbar select:focus{outline:2px solid #bfd8c8;outline-offset:0;border-color:#9dc3ad}
+/* Schaltflächen: eine klare Hauptaktion, Rest leise */
+.crm.workspace button{border-radius:9px;font-size:13px;font-weight:600;padding:0 14px;height:36px;background:var(--v3-brand);color:#fff;border:1px solid transparent;box-shadow:none;transition:background .15s,border-color .15s}
+.crm.workspace button:hover:not(:disabled){background:var(--v3-brand-hover);box-shadow:none;transform:none}
+.crm.workspace button.secondary{background:#fff;color:var(--v3-ink);border-color:var(--v3-line)}
+.crm.workspace button.secondary:hover:not(:disabled){background:#f3f6f3;border-color:#cfd9d2}
+.crm.workspace button.danger{background:#fff;color:var(--v3-bad);border-color:#efd3cc}
+.crm.workspace button.danger:hover:not(:disabled){background:var(--v3-bad-bg)}
+.crm.workspace button:disabled{opacity:.5;cursor:not-allowed}
+.crm.workspace .text-button{background:none;border:0;color:var(--v3-ink);height:auto;padding:0;font-size:14px;font-weight:700;text-align:left;text-decoration:none}
+.crm.workspace .text-button:hover:not(:disabled){background:none;color:var(--v3-brand);text-decoration:underline}
+/* Tabellen: kompakt, ruhige Zeilen */
+.crm.workspace .table-wrap{border:1px solid var(--v3-line);border-radius:12px;overflow:auto;background:#fff;max-height:none}
+.crm.workspace table{width:100%;border-collapse:separate;border-spacing:0}
+.crm.workspace th{position:sticky;top:0;z-index:1;background:#f7f9f7;color:var(--v3-muted);font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--v3-line);white-space:nowrap;text-align:left}
+.crm.workspace td{padding:12px 14px;border-bottom:1px solid var(--v3-line-soft);font-size:13px;vertical-align:top}
+.crm.workspace tbody tr:last-child td{border-bottom:0}
+.crm.workspace tbody tr:hover td{background:#fafcfa}
+.crm.workspace td strong{font-weight:650;color:var(--v3-ink)}
+.crm.workspace td small{display:block;margin-top:2px;font-size:12px;line-height:1.45;color:var(--v3-muted)}
+.crm.workspace td code{font-size:11px;color:var(--v3-muted);background:#f2f5f2;border-radius:5px;padding:2px 6px}
+.crm.workspace td .row-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start}
+.crm.workspace td .row-actions button,.crm.workspace td>button{height:30px;font-size:12px;padding:0 11px;border-radius:7px}
+/* Status-Pillen */
+.crm.workspace .badge,.crm.workspace .status-pill{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:999px;font-size:11px;font-weight:650;letter-spacing:0;text-transform:none;background:var(--v3-off-bg);color:var(--v3-off);border:0;white-space:nowrap}
+.crm.workspace .status-pill:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.75}
+.crm.workspace .status-pill.ok{background:var(--v3-ok-bg);color:var(--v3-ok)}
+.crm.workspace .status-pill.warn{background:var(--v3-warn-bg);color:var(--v3-warn)}
+.crm.workspace .status-pill.off{background:var(--v3-off-bg);color:var(--v3-off)}
+.crm.workspace .status-pill.neutral{background:var(--v3-off-bg);color:var(--v3-off)}
+.crm.workspace td .status-pill+small{margin-top:5px}
+/* Reiter innerhalb einer Seite (Kurse / Buchungen) */
+.crm.workspace .subtabs{display:inline-flex;gap:3px;padding:3px;margin:0 0 16px;background:#e9eee9;border-radius:11px}
+.crm.workspace .subtabs button{height:32px;padding:0 18px;background:transparent;color:var(--v3-muted);border-radius:8px;font-weight:650}
+.crm.workspace .subtabs button:hover:not(:disabled){background:#dde5df;color:var(--v3-ink)}
+.crm.workspace .subtabs button.active{background:#fff;color:var(--v3-ink);box-shadow:0 1px 3px rgba(23,48,42,.12)}
+/* Weitere Filter einklappbar */
+.crm.workspace .crm-attribute-filters{margin:0 0 14px;padding:0;border:1px solid var(--v3-line);border-radius:11px;background:#fff}
+.crm.workspace .crm-attribute-filters>summary{cursor:pointer;list-style:none;padding:10px 14px;font-size:13px;font-weight:650;color:var(--v3-ink);display:flex;align-items:center;gap:8px}
+.crm.workspace .crm-attribute-filters>summary::-webkit-details-marker{display:none}
+.crm.workspace .crm-attribute-filters>summary:before{content:"▸";font-size:11px;color:var(--v3-muted);transition:transform .15s}
+.crm.workspace .crm-attribute-filters[open]>summary:before{transform:rotate(90deg)}
+.crm.workspace .crm-attribute-filters[open]>summary{border-bottom:1px solid var(--v3-line-soft)}
+.crm.workspace .crm-attribute-filters>.crm-attribute-heading,.crm.workspace .crm-attribute-filters>.crm-attribute-grid,.crm.workspace .crm-attribute-filters>small{margin-left:14px;margin-right:14px}
+.crm.workspace .crm-attribute-filters>.crm-attribute-heading{margin-top:12px;margin-bottom:10px}
+.crm.workspace .crm-attribute-filters>.crm-attribute-heading strong{font-size:12px;color:var(--v3-muted);font-weight:650}
+.crm.workspace .crm-attribute-filters>.crm-attribute-grid{margin-bottom:6px}
+.crm.workspace .crm-attribute-filters>small{margin-top:8px;margin-bottom:12px}
+/* Formulare und Dialoge */
+.crm.workspace .dialog{border-radius:16px;border:1px solid var(--v3-line);box-shadow:0 24px 80px rgba(16,43,34,.25);padding:28px 32px}
+.crm.workspace .dialog h2{font-size:20px}
+.crm.workspace .overlay{background:rgba(16,43,34,.45);backdrop-filter:blur(2px)}
+.crm.workspace .detail-tabs{gap:4px;padding:3px;background:#e9eee9;border-radius:11px}
+.crm.workspace .detail-tabs button{height:34px;background:transparent;color:var(--v3-muted);border-radius:8px}
+.crm.workspace .detail-tabs button.active{background:#fff;color:var(--v3-ink);box-shadow:0 1px 3px rgba(23,48,42,.12)}
+.crm.workspace .detail-summary-card{border:1px solid var(--v3-line);border-radius:12px;background:#fff;box-shadow:none}
+.crm.workspace label{font-size:12px;font-weight:650;color:var(--v3-muted)}
+.crm.workspace input:not([type=checkbox]):not([type=radio]),.crm.workspace select,.crm.workspace textarea{border:1px solid var(--v3-line);border-radius:9px;background:#fff;color:var(--v3-ink);font-size:13px}
+.crm.workspace input:not([type=checkbox]):not([type=radio]):focus,.crm.workspace select:focus,.crm.workspace textarea:focus{outline:2px solid #bfd8c8;border-color:#9dc3ad}
+/* Hinweise */
+.crm.workspace .notice{background:var(--v3-ok-bg);border:1px solid #cfe6d4;color:var(--v3-ok);border-radius:10px;padding:10px 14px}
+.crm.workspace .error{background:var(--v3-bad-bg);border:1px solid #f1cfc7;color:var(--v3-bad);border-radius:10px;padding:10px 14px}
+.crm.workspace .empty{padding:40px 20px;text-align:center;color:var(--v3-muted)}
+/* Seitenleiste: ruhiger, klarere aktive Markierung */
+.crm.workspace aside.sponti-crm-sidebar{width:240px;padding:26px 16px 16px}
+.crm.workspace main{margin-left:240px;width:calc(100% - 240px)}
+.crm.workspace aside .nav-groups .nav-primary{padding:10px 12px;min-height:42px;font-size:13.5px;gap:11px}
+.crm.workspace aside .nav-compact-subitems .nav-subitem{padding:8px 12px;font-size:13px}
+.crm.workspace aside .nav-compact-subitems .nav-subitem.active{background:rgba(255,255,255,.14);color:#fff;font-weight:700}
+/* Mobil */
+@media(max-width:1000px){.crm.workspace .stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+  .crm.workspace main{margin-left:0;width:100%;padding:20px 14px 40px}
+  .crm.workspace aside.sponti-crm-sidebar{width:100%}
+  .crm.workspace .toolbar>input,.crm.workspace .toolbar>select{flex:1 1 100%;max-width:none}
+  .crm.workspace .panel{padding:16px 14px}
+  .crm.workspace main>header h1{font-size:22px}
+}
