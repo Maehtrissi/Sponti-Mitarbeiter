@@ -131,6 +131,7 @@ export type Database = {
         Row: {
           archived_at: string | null
           booking_url: string
+          payment_link: string
           category: string
           created_at: string
           description: string
@@ -154,6 +155,7 @@ export type Database = {
         Insert: {
           archived_at?: string | null
           booking_url?: string
+          payment_link?: string
           category: string
           created_at?: string
           description?: string
@@ -170,6 +172,7 @@ export type Database = {
         Update: {
           archived_at?: string | null
           booking_url?: string
+          payment_link?: string
           category?: string
           created_at?: string
           description?: string
@@ -429,6 +432,9 @@ export type Database = {
       }
       Kursanbieter: {
         Row: {
+          agb_accepted: boolean | null
+          agb_accepted_at: string | null
+          agb_version: string | null
           archived_at: string | null
           category: string
           company: string
@@ -445,6 +451,9 @@ export type Database = {
           website_url: string
         }
         Insert: {
+          agb_accepted?: boolean | null
+          agb_accepted_at?: string | null
+          agb_version?: string | null
           archived_at?: string | null
           category: string
           company: string
@@ -461,6 +470,9 @@ export type Database = {
           website_url?: string
         }
         Update: {
+          agb_accepted?: boolean | null
+          agb_accepted_at?: string | null
+          agb_version?: string | null
           archived_at?: string | null
           category?: string
           company?: string

@@ -3,7 +3,8 @@ export const courseRegions:Record<string,string>={zug:'Zug',zuerich:'Zürich',lu
 export function toLocalInput(iso:string){const d=new Date(iso);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
 export function coursePayload(input:Record<string,unknown>){
  const text=(key:string,max:number,required=false)=>{const value=String(input[key]??'').trim();if(value.length>max||(required&&!value))throw new Error('Bitte Titel, Ort und gültige Kursangaben ausfüllen.');return value;};
- const title=text('title',200,true),description=text('description',4000),venue=text('venue',300,true),booking_url=text('booking_url',2048);
+ const title=text('title',200,true),description=text('description',4000),venue=text('venue',300,true),booking_url=text('booking_url',2048),payment_link=text('payment_link',2048);
+ if(payment_link){let url:URL;try{url=new URL(payment_link);}catch{throw new Error('Bitte einen gültigen Zahlungslink angeben.');}if(url.protocol!=='https:'||!url.hostname||url.username||url.password||/\s/.test(payment_link))throw new Error('Der Zahlungslink muss mit https:// beginnen.');}
  if(booking_url){let url:URL;try{url=new URL(booking_url);}catch{throw new Error('Bitte einen gültigen Buchungslink angeben.');}if(!['https:','http:'].includes(url.protocol)||!url.hostname||url.username||url.password||/\s/.test(booking_url))throw new Error('Der Buchungslink muss mit https:// oder http:// beginnen.');}
  const category=String(input.category),region=String(input.region),status=String(input.status);
  if(!Object.hasOwn(courseCategories,category)||!Object.hasOwn(courseRegions,region)||!['draft','published'].includes(status))throw new Error('Ungültige Kategorie, Region oder Sichtbarkeit.');
@@ -13,5 +14,5 @@ export function coursePayload(input:Record<string,unknown>){
  const provider_id=String(input.provider_id||'')||null;
  if(provider_id&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(provider_id))throw new Error('Ungültiger Kursanbieter.');
  const extra={ticket_type:text('ticket_type',200),meeting_point:text('meeting_point',1000),cancellation_policy:text('cancellation_policy',3000),additional_info:text('additional_info',4000),accessibility:text('accessibility',3000),help_info:text('help_info',2000),similar_experiences:text('similar_experiences',2000)};
- return {title,description,venue,booking_url,category,region,status,starts_at:date.toISOString(),price:Math.round(price*100)/100,seats,provider_id,...extra};
+ return {title,description,venue,booking_url,payment_link,category,region,status,starts_at:date.toISOString(),price:Math.round(price*100)/100,seats,provider_id,...extra};
 }

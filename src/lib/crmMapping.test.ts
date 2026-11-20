@@ -39,6 +39,9 @@ test('website submissions remain requests until staff confirm them',()=>{
   const approved={...request,status:'Partner'};
   assert.equal(isApprovedProvider(approved),true);
   assert.equal(isProviderRequest(approved),false);
+  const live={...request,status:'Live'};
+  assert.equal(isApprovedProvider(live),true);
+  assert.equal(isProviderRequest(live),false);
   assert.equal(isApprovedProvider({...approved,archived_at:'2026-10-04T10:00:00Z'}),false);
   assert.equal(isProviderRequest({...request,archived_at:'2026-10-04T10:00:00Z'}),false);
 });
