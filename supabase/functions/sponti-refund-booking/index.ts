@@ -17,10 +17,14 @@ Deno.serve(async req=>{
  let body:any;try{body=await req.json()}catch{return json({error:"Ungültige Anfrage."},400)}
  if(!body||typeof body.booking_id!=="string"||!uuid.test(body.booking_id))return json({error:"Ungültige Buchungsnummer."},400);
  const db=createClient(url,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,{auth:{persistSession:false,autoRefreshToken:false}});
- const {data:b}=await db.from("course_checkout_bookings").select("id,booking_status,payment_status,payment_reference,total_chf,payout_mode").eq("id",body.booking_id).maybeSingle();
+ const {data:b}=await db.from("course_checkout_bookings").select("id,course_id,booking_status,payment_status,payment_reference,total_chf,payout_mode").eq("id",body.booking_id).maybeSingle();
  if(!b)return json({error:"Buchung nicht gefunden."},404);
  if(b.booking_status==="refunded")return json({ok:true,already:true});
  if(b.booking_status!=="confirmed"||b.payment_status!=="paid"||!String(b.payment_reference||"").startsWith("cs_test_"))return json({error:"Nur bezahlte, bestätigte Testbuchungen können hier zurückerstattet werden."},409);
+ // Frist: bis 24 Stunden vor Kursbeginn. Ausnahme: der Kurs wurde abgesagt (archiviert oder nicht mehr veröffentlicht).
+ const {data:course}=await db.from("courses").select("starts_at,status,archived_at").eq("id",b.course_id).maybeSingle();
+ const cancelledCourse=!course||course.archived_at!==null||course.status!=="published";
+ if(!cancelledCourse&&new Date(course.starts_at).getTime()-Date.now()<24*3600*1000)return json({error:"Rückerstattung nur bis 24 Stunden vor Kursbeginn möglich."},409);
  if(b.payout_mode!=="stripe_split")return json({error:"Diese Buchung nutzt die spätere Auszahlung. Bitte direkt in Stripe prüfen."},409);
  const stripe=async(path:string,params?:URLSearchParams,idem?:string)=>{
   const headers:Record<string,string>={authorization:"Bearer "+secret};
