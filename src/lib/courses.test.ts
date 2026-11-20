@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {coursePayload,toLocalInput} from './courses.ts';
+import {coursePayload,toLocalInput,platformFee} from './courses.ts';
 const base={title:'Yoga',description:'',category:'yoga-wellness',region:'zug',venue:'Studio Zug',starts_at:new Date(Date.now()+86400000).toISOString(),price:'12.50',seats:'4',booking_url:'',status:'draft',provider_id:''};
 test('draft, price, seats and optional provider are mapped',()=>{const c=coursePayload(base);assert.equal(c.status,'draft');assert.equal(c.price,12.5);assert.equal(c.seats,4);assert.equal(c.provider_id,null);});
 test('past or full courses cannot be published',()=>{assert.throws(()=>coursePayload({...base,status:'published',starts_at:'2020-01-01'}));assert.throws(()=>coursePayload({...base,status:'published',seats:'0'}));assert.equal(coursePayload({...base,seats:'0'}).status,'draft');});
@@ -8,3 +8,5 @@ test('booking URLs reject executable protocols and credentials',()=>{for(const b
 test('negative or fractional seats, empty numeric fields and invalid categories are rejected',()=>{for(const value of [{seats:'1.5'},{price:'-2'},{seats:''},{price:''},{category:'unknown'}])assert.throws(()=>coursePayload({...base,...value}));});
 test('local editor preserves appointment timestamp',()=>{const minuteDate=new Date(base.starts_at);minuteDate.setSeconds(0,0);assert.equal(new Date(toLocalInput(minuteDate.toISOString())).getTime(),minuteDate.getTime());});
 test('payment links must be https without credentials',()=>{for(const payment_link of ['http://buy.stripe.com/x','javascript:alert(1)','https://user:pass@buy.stripe.com/x','https://buy.stripe.com/a b'])assert.throws(()=>coursePayload({...base,payment_link}));assert.equal(coursePayload({...base,payment_link:'https://buy.stripe.com/test_123'}).payment_link,'https://buy.stripe.com/test_123');assert.equal(coursePayload({...base}).payment_link,'');});
+
+test('platform fee: 20 % under CHF 20.00, 15 % from CHF 20.00, per seat',()=>{assert.deepEqual(platformFee(19.99),{percent:20,feeChf:4,providerChf:15.99});assert.deepEqual(platformFee(20),{percent:15,feeChf:3,providerChf:17});assert.deepEqual(platformFee(30),{percent:15,feeChf:4.5,providerChf:25.5});assert.deepEqual(platformFee(12.5),{percent:20,feeChf:2.5,providerChf:10});assert.equal(platformFee(0),null);assert.equal(platformFee(NaN),null);});
