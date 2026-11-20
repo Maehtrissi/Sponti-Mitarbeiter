@@ -537,3 +537,54 @@
 .crm.workspace .task{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
 .crm.workspace .subtabs button.active:hover:not(:disabled){background:#fff;color:var(--v3-ink)}
 .crm.workspace .detail-tabs button.active:hover:not(:disabled){background:#fff;color:var(--v3-ink)}
+
+/* ==========================================================================
+   v4 – helle Seitenleiste, grössere Schrift, weichere Flächen
+   ========================================================================== */
+.crm.workspace{--v3-bg:#f6f4ef;--v3-line:#e8e4da;--v3-line-soft:#f1eee6;--v3-brand:#2d6a4f;--v3-brand-hover:#235740;--v3-accent:#e07a3f;font-size:15px}
+.crm.workspace aside.sponti-crm-sidebar{background:#fff;color:var(--v3-ink);border-right:1px solid var(--v3-line);box-shadow:none;width:250px}
+.crm.workspace main{margin-left:250px;width:calc(100% - 250px)}
+.crm.workspace aside .crm-sidebar-brand .brand{color:var(--v3-brand)}
+.crm.workspace aside .crm-sidebar-brand .brand-dot{color:var(--v3-accent)}
+.crm.workspace aside .crm-sidebar-brand .eyebrow{color:#9a9a8c}
+.crm.workspace aside.sponti-crm-sidebar .nav-groups button.nav-primary,
+.crm.workspace aside.sponti-crm-sidebar nav button{background:transparent;color:#3d4d45;font-weight:600;border-radius:10px;justify-content:flex-start}
+.crm.workspace aside.sponti-crm-sidebar .nav-groups button.nav-primary .nav-label{flex:1;text-align:left}
+.crm.workspace aside.sponti-crm-sidebar nav button:hover:not(:disabled){background:#f1f5f0;color:var(--v3-ink)}
+.crm.workspace aside.sponti-crm-sidebar .nav-groups button.nav-primary.active,
+.crm.workspace aside.sponti-crm-sidebar .nav-groups button.nav-primary.active-parent,
+.crm.workspace aside.sponti-crm-sidebar .nav-groups button.nav-primary.expanded{background:#e8f2ea;color:var(--v3-brand);box-shadow:none}
+.crm.workspace aside.sponti-crm-sidebar .nav-icon{color:#7d8d84}
+.crm.workspace aside.sponti-crm-sidebar .nav-primary.active .nav-icon,
+.crm.workspace aside.sponti-crm-sidebar .nav-primary.expanded .nav-icon{color:var(--v3-brand)}
+.crm.workspace aside.sponti-crm-sidebar .nav-compact-group+.nav-compact-group{border-top:0}
+.crm.workspace aside.sponti-crm-sidebar .nav-compact-subitems{border-left:2px solid var(--v3-line);margin-left:20px;padding-left:6px}
+.crm.workspace aside.sponti-crm-sidebar .nav-compact-subitems .nav-subitem{color:#5b6b63;font-weight:550;border-radius:8px}
+.crm.workspace aside.sponti-crm-sidebar .nav-compact-subitems .nav-subitem.active{background:#e8f2ea;color:var(--v3-brand);font-weight:700}
+.crm.workspace aside.sponti-crm-sidebar .nav-count{background:#eceae2;color:#5b6b63}
+.crm.workspace aside.sponti-crm-sidebar .nav-count-alert{background:var(--v3-accent);color:#fff}
+.crm.workspace aside .account{border-top:1px solid var(--v3-line)}
+.crm.workspace aside .crm-sidebar-account-email,.crm.workspace aside .account small{color:var(--v3-muted)}
+.crm.workspace aside .account .secondary{background:#fff;color:var(--v3-ink);border:1px solid var(--v3-line)}
+.crm.workspace aside .account .secondary:hover:not(:disabled){background:#f3f1ea}
+/* Grössere Schrift und mehr Luft im Hauptbereich */
+.crm.workspace main>header h1{font-size:30px;letter-spacing:-.8px}
+.crm.workspace main>header .workspace-description{font-size:14px}
+.crm.workspace td{font-size:14px;padding:14px 16px}
+.crm.workspace td small{font-size:12.5px}
+.crm.workspace th{font-size:11.5px;padding:12px 16px}
+.crm.workspace .panel{border-radius:16px;padding:24px 26px;border-color:var(--v3-line)}
+.crm.workspace .panel h2{font-size:18px}
+.crm.workspace .stats article{border-radius:16px;padding:20px 22px}
+.crm.workspace .stats article strong{font-size:36px}
+.crm.workspace .stats article span{font-size:13px}
+.crm.workspace .toolbar>input,.crm.workspace .toolbar>select{height:42px;font-size:14px;border-radius:11px}
+.crm.workspace button{height:40px;font-size:14px;border-radius:11px;padding:0 18px}
+.crm.workspace td .row-actions button,.crm.workspace td>button{height:32px;font-size:13px}
+.crm.workspace .subtabs{background:#ece9e0}
+.crm.workspace .subtabs button{height:36px}
+.crm.workspace .table-wrap{border-radius:14px}
+.crm.workspace th{background:#faf8f3}
+.crm.workspace tbody tr:hover td{background:#fbfaf6}
+.crm.workspace .status-pill,.crm.workspace .badge{height:24px;font-size:12px}
+@media(max-width:760px){.crm.workspace main{margin-left:0;width:100%}.crm.workspace aside.sponti-crm-sidebar{width:100%}}
