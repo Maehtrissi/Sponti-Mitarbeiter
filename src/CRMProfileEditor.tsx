@@ -19,7 +19,11 @@ const provider:Field[]=[
  {key:'message',label:'Nachricht aus der Anmeldung / Anfrage',type:'textarea'},
  {key:'description',label:'Kurzbeschreibung',type:'textarea'},{key:'about_text',label:'Über uns',type:'textarea'},{key:'public_email',label:'Öffentliche E-Mail',type:'email'},
  {key:'public_phone',label:'Öffentliche Telefonnummer'}, {key:'booking_url',label:'Buchungslink',type:'url'},
- {key:'internal_notes',label:'Interne Notizen',type:'textarea'}
+ {key:'internal_notes',label:'Interne Notizen',type:'textarea'},
+ {key:'legal_form',label:'Rechtsform',type:'select',choices:['','Einzelfirma','GmbH','AG','Verein','Stiftung','Kollektivgesellschaft','Privatperson','Andere']},
+ {key:'representative_name',label:'Vertretungsberechtigte Person'},{key:'uid_number',label:'UID (CHE-…)'},{key:'vat_number',label:'MWST-Nummer'},
+ {key:'billing_street',label:'Rechnungsadresse: Strasse und Nr.'},{key:'billing_postal_code',label:'Rechnungsadresse: PLZ'},{key:'billing_city',label:'Rechnungsadresse: Ort'},
+ {key:'commission_override_percent',label:'Sonderprovision in % (leer = Standard)'}
 ];
 const categories=[['yoga-wellness','Yoga & Wellness'],['kochen-geniessen','Kochen & Geniessen'],['kunst-handwerk','Kunst & Handwerk'],['fotografie-design','Fotografie & Design'],['tanz-bewegung','Tanz & Bewegung'],['natur-draussen','Natur & Draussen']];
 const regions=[['schweiz','Ganze Schweiz'],['zug','Zug'],['zuerich','Zürich'],['luzern','Luzern'],['schwyz','Schwyz'],['aargau','Aargau'],['andere','Andere Regionen']];
@@ -108,6 +112,7 @@ export default function CRMProfileEditor({contactId,kind,onSaved}:Props){
  {title:'Anmeldung & Anfrage',description:'Die ursprüngliche Anfrage des Kursanbieters. Auch ohne verknüpftes Benutzerkonto bearbeitbar.',keys:['message']},
  {title:'Öffentliche Kontaktdaten & Links',description:'Diese Angaben gehören zum öffentlichen Anbieterprofil.',keys:['public_email','public_phone','website','booking_url']},
  {title:'Unternehmen vorstellen',description:'Öffentliche Beschreibung für Interessierte.',keys:['description','about_text']},
+ {title:'Rechnung & Vertrag',description:'Angaben für Provisionsrechnungen. Der Anbieter kann sie auch selbst im Anbieterboard erfassen.',keys:['legal_form','representative_name','uid_number','vat_number','billing_street','billing_postal_code','billing_city','commission_override_percent']},
  {title:'Interne Informationen',description:'Notizen für die Zusammenarbeit, nicht für das öffentliche Profil.',keys:['internal_notes']}
 ]).map(group=>{const fields=(kind==='customer'?customer:provider.filter(f=>data?.linked||!['postal_code','city','description','about_text','public_email','public_phone','booking_url','internal_notes'].includes(f.key))).filter(f=>group.keys.includes(f.key));return fields.length>0&&<fieldset className="profile-field-group" key={group.title}><legend>{group.title}</legend><p className="muted">{group.description}</p><div className="crm-profile-grid">{group.keys.map(key=>fields.find(f=>f.key===key)).filter((f):f is Field=>!!f).map(f=><div key={f.key} style={f.key==='contact_name'||f.type==='textarea'?{gridColumn:'1 / -1'}:undefined}>{kind==='provider'&&f.key==='contact_name'&&<p className="muted">Die folgenden Kontaktdaten sind für den privaten Kontakt mit Sponti bestimmt und werden nicht im öffentlichen Anbieterprofil angezeigt.</p>}{field(f)}</div>)}</div></fieldset>})}
    {kind==='customer'&&data?.linked&&<>
