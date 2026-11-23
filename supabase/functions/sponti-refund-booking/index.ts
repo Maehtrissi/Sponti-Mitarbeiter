@@ -24,7 +24,8 @@ Deno.serve(async req=>{
  // Frist: bis 24 Stunden vor Kursbeginn. Ausnahme: der Kurs wurde abgesagt (archiviert oder nicht mehr veröffentlicht).
  const {data:course}=await db.from("courses").select("starts_at,status,archived_at").eq("id",b.course_id).maybeSingle();
  const cancelledCourse=!course||course.archived_at!==null||course.status!=="published";
- if(!cancelledCourse&&new Date(course.starts_at).getTime()-Date.now()<24*3600*1000)return json({error:"Rückerstattung nur bis 24 Stunden vor Kursbeginn möglich."},409);
+ const markOnly=body.mode==="mark_only";
+ if(!markOnly&&!cancelledCourse&&new Date(course.starts_at).getTime()-Date.now()<24*3600*1000)return json({error:"Rückerstattung nur bis 24 Stunden vor Kursbeginn möglich."},409);
  if(b.payout_mode!=="stripe_split")return json({error:"Diese Buchung nutzt die spätere Auszahlung. Bitte direkt in Stripe prüfen."},409);
  const stripe=async(path:string,params?:URLSearchParams,idem?:string)=>{
   const headers:Record<string,string>={authorization:"Bearer "+secret};
@@ -35,19 +36,29 @@ Deno.serve(async req=>{
   if(!r.ok)throw Error("Stripe "+r.status+" "+String(obj?.error?.code||"error"));
   return obj;
  };
+ let warning="";
  try{
   const session=await stripe("checkout/sessions/"+encodeURIComponent(b.payment_reference));
   if(session.payment_status!=="paid"||session.livemode!==false||session.amount_total!==Math.round(Number(b.total_chf)*100)||!session.payment_intent)throw Error("Zahlung stimmt nicht mit der Buchung überein.");
   const intent=await stripe("payment_intents/"+encodeURIComponent(session.payment_intent));
   if(intent.status!=="succeeded"||!intent.transfer_data?.destination)throw Error("Zahlung wurde nicht mit Aufteilung erstellt.");
-  // Volle Rückerstattung an den Kunden. Der Anbieteranteil wird beim Anbieter zurückgebucht, auch Sponti gibt die eigene Gebühr zurück.
+  if(markOnly){
+   // Rückerstattung wurde schon direkt bei Stripe gemacht: nur prüfen, ob sie dort wirklich voll erfolgt ist, und die Buchung nachziehen.
+   if(!intent.latest_charge)throw Error("Zahlung bei Stripe nicht gefunden.");
+   const charge=await stripe("charges/"+encodeURIComponent(intent.latest_charge)+"?expand[]=transfer");
+   if(charge.refunded!==true||charge.amount_refunded!==charge.amount)throw Error("Bei Stripe ist diese Zahlung noch nicht voll zurückerstattet.");
+   const tr=charge.transfer;
+   if(tr&&typeof tr==="object"&&Number(tr.amount_reversed||0)<Number(tr.amount||0))warning="Der Anbieteranteil wurde bei Stripe noch nicht zurückgebucht. Bitte dort die Überweisung an den Anbieter rückgängig machen.";
+  }else{
+ // Volle Rückerstattung an den Kunden. Der Anbieteranteil wird beim Anbieter zurückgebucht, auch Sponti gibt die eigene Gebühr zurück.
   const params=new URLSearchParams({payment_intent:intent.id,reverse_transfer:"true",refund_application_fee:"true","metadata[sponti_booking_id]":b.id});
   const refund=await stripe("refunds",params,"sponti-refund-"+b.id);
   if(!refund.id||!["succeeded","pending"].includes(refund.status))throw Error("Rückerstattung wurde von Stripe nicht angenommen.");
+  }
  }catch(e){
   return json({error:e instanceof Error?e.message:"Rückerstattung fehlgeschlagen."},502);
  }
  const {error}=await db.rpc("sponti_mark_booking_refunded",{p_booking_id:b.id});
  if(error)return json({error:"Stripe hat zurückgezahlt, aber die Buchung konnte nicht aktualisiert werden. Bitte nochmals auf «Rückerstatten» klicken."},500);
- return json({ok:true});
+ return json(warning?{ok:true,warning}:{ok:true});
 });
