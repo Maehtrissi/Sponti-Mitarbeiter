@@ -71,6 +71,23 @@ export default function IndependentCRM({request=serverApi,storageLabel='Eigene D
     const {error}=await supabase.functions.invoke('sponti-crm-stripe-sync',{body:providerId?{provider_id:providerId}:{}});
     if(error)throw new Error('Stripe-Status konnte nicht geladen werden.');
   }
+  async function saveStripeAccount(c:Contact,form:HTMLFormElement) {
+    const input=form.elements.namedItem('stripe_account_id') as HTMLInputElement;
+    const value=input.value.trim();
+    setBusy(true);setError('');setNotice('');
+    try {
+      const {data,error}=await supabase.functions.invoke('sponti-crm-stripe-sync',{body:{provider_id:c.id.replace(/^provider:/,''),set_account_id:value}});
+      if(error){
+        let message='Die Stripe-Konto-ID konnte nicht gespeichert werden.';
+        try{const body=await (error as {context?:Response}).context?.json();if(body?.error)message=String(body.error);}catch{/* Standardtext */}
+        throw new Error(message);
+      }
+      await reload();
+      setSelected(prev=>prev&&prev.id===c.id?{...prev,stripe_account_id:value||null}:prev);
+      setNotice(value?'Stripe-Konto gespeichert und Status abgeglichen.':'Stripe-Konto entfernt.');
+    } catch(e) {setError(e instanceof Error?e.message:'Die Stripe-Konto-ID konnte nicht gespeichert werden.');}
+    finally {setBusy(false);}
+  }
   useEffect(()=>{if(session)syncStripe().then(()=>reload()).catch(()=>{/* Status bleibt wie zuletzt gespeichert. */});},[session]);
   async function reload() {
     const [c,t] = await Promise.all([api<Contact[]>('contacts'),api<Task[]>('tasks')]);
@@ -227,7 +244,7 @@ export default function IndependentCRM({request=serverApi,storageLabel='Eigene D
  {title:selected.kind==='customer'?'Interessen & Kursinfos':'Angebot & Zusammenarbeit',rows:selected.kind==='customer'?[['Interessen',selected.interest],['Kursinfos über',selected.channel]]:[['Kategorie',selected.interest],['Kursangebot',selected.offer_type]]},
  {title:'CRM-Verwaltung',rows:[['Status',selected.status],['Quelle',selected.source],['Erfasst am',date(selected.created_at)],...(selected.kind==='provider'?[['AGB akzeptiert',agbLabel(selected)],['Medien-Zustimmung',selected.media_consent===true?'Ja'+(selected.media_consent_at?' · '+dateOnly(selected.media_consent_at):''):selected.media_consent===false?'Nein':'Nicht erfasst'],['Freigeschaltet am',dateOnly(selected.approved_at)]]:[])]},
  ...(selected.kind==='provider'?[{title:'Stripe & Auszahlung',rows:[['Status',stripeState(selected).label],['Angaben bei Stripe',selected.stripe_requirements_due?selected.stripe_requirements_due+' offen':selected.stripe_checked_at?'Vollständig':''],['Zuletzt geprüft',selected.stripe_checked_at?new Date(selected.stripe_checked_at).toLocaleString('de-CH'):'']]},{title:'Provision',rows:[['Provision',selected.commission_override_percent!=null?selected.commission_override_percent+' % (Sonderkondition)':'Standard (20 % / 15 %)']]}]:[])
-].map(group=><section className="detail-summary-card" key={group.title}><h3>{group.title}</h3><dl>{group.rows.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value||'Nicht angegeben'}</dd></div>)}</dl>{group.title==='Stripe & Auszahlung'&&selected.kind==='provider'&&stripeDashboardUrl(selected)&&<p><a href={stripeDashboardUrl(selected)} target="_blank" rel="noopener noreferrer">Im Stripe-Dashboard öffnen{selected.stripe_mode==='live'?'':' (Testmodus)'}</a></p>}</section>)}</div>
+].map(group=><section className="detail-summary-card" key={group.title}><h3>{group.title}</h3><dl>{group.rows.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value||'Nicht angegeben'}</dd></div>)}</dl>{group.title==='Stripe & Auszahlung'&&selected.kind==='provider'&&<form className="stripe-account-form" onSubmit={e=>{e.preventDefault();saveStripeAccount(selected,e.currentTarget);}}><label>Stripe-Konto-ID<input name="stripe_account_id" key={selected.id+(selected.stripe_account_id||'')} defaultValue={selected.stripe_account_id||''} placeholder="acct_…" autoComplete="off" spellCheck={false} /></label><small>In Stripe unter Connect → Verbundene Konten kopieren. Leer lassen und speichern, um die Zuordnung zu entfernen.</small><button type="submit" disabled={busy}>Speichern</button></form>}{group.title==='Stripe & Auszahlung'&&selected.kind==='provider'&&stripeDashboardUrl(selected)&&<p><a href={stripeDashboardUrl(selected)} target="_blank" rel="noopener noreferrer">Im Stripe-Dashboard öffnen{selected.stripe_mode==='live'?'':' (Testmodus)'}</a></p>}</section>)}</div>
 {selected.kind==='provider'&&isApprovedProvider(selected)&&<section className="detail-message"><h3>Bereit für den Livegang?</h3><p>{providerReady(selected)?'Ja – Stripe ist bereit und die AGB sind akzeptiert.':'Noch nicht: '+[stripeState(selected).tone!=='ok'?'Stripe-Onboarding abschliessen':'',selected.agb_accepted!==true?'AGB-Zustimmung fehlt':''].filter(Boolean).join(' · ')+'.'}</p><div className="row-actions"><button type="button" className="secondary" disabled={busy} onClick={()=>perform(async()=>{await syncStripe(selected.id.split(':')[1]);await reload();setNotice('Stripe-Status aktualisiert.');})}>Stripe-Status aktualisieren</button></div></section>}
 {selected.message&&<section className="detail-message"><h3>Nachricht aus der Anmeldung</h3><p>{selected.message}</p></section>}
 </div>
