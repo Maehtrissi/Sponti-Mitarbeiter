@@ -61,8 +61,8 @@ Deno.serve(async(req)=>{
   const {error:profileError}=await admin.from("provider_profiles").upsert({user_id:uid,company:provider.company||"",contact_name:provider.contact||"",phone:provider.phone||"",location:provider.location||"",website:provider.website_url||"",category:provider.category||"",description:"",booking_url:""},{onConflict:"user_id",ignoreDuplicates:true});
   if(profileError){await admin.rpc("crm_provider_account_admin",{p_action:"delete",p_user_id:uid});return json({error:"Anbieterprofil konnte nicht vorbereitet werden. Bitte erneut versuchen; das Konto bleibt erhalten."},500);}
   if(reusedExisting){
-   const publicClient=createClient(url,Deno.env.get("SUPABASE_ANON_KEY")||key,{auth:{persistSession:false,autoRefreshToken:false}});
-   const {error:resetError}=await publicClient.auth.resetPasswordForEmail(provider.email,{redirectTo:"https://sponti-switzerland.ch/anbieter.html"});
+   // Service-Role-Client: Supabase verlangt hier kein Captcha-Token (Bot-Schutz aktiv).
+   const {error:resetError}=await admin.auth.resetPasswordForEmail(provider.email,{redirectTo:"https://sponti-switzerland.ch/anbieter.html"});
    if(resetError) return json({error:"Zugang verknüpft, aber die E-Mail konnte nicht gesendet werden. Bitte SMTP prüfen und den Anbieter-Zugang erneut senden."},502);
    return json({ok:true,email:provider.email,existing:true});
   }
