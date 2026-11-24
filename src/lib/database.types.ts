@@ -15,7 +15,7 @@ export type Database = {
   public: {
     Tables: {
       course_reviews: {
-        Row: {id:string;name:string;course:string;review:string;status:string;created_at:string;reply:string;replied_at:string|null}
+        Row: {id:string;name:string;course:string;review:string;status:string;created_at:string;reply:string;replied_at:string|null;rating:number|null;course_id:string|null}
         Insert: {id?:string;name:string;course:string;review:string;status?:string;created_at?:string;reply?:string;replied_at?:string|null}
         Update: {status?:string;reply?:string}
         Relationships: []
