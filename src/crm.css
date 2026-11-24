@@ -597,3 +597,39 @@
 .stripe-account-form label{display:grid;gap:4px;font-weight:600}
 .stripe-account-form input{font-family:monospace}
 .stripe-account-form small{color:#667}
+
+/* Einfache Kunden- und Anbieterlisten — 2026-11-24 */
+.crm .crm-simple-list .crm-list-hint{margin:0 0 14px;font-size:13px}
+.crm .crm-list-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}
+.crm .crm-list-bar input{flex:1 1 260px;min-width:0;height:42px;border:1px solid #d6e0d6;border-radius:10px;background:#fff;padding:0 14px;font-size:14px;color:#19342d}
+.crm .crm-list-bar select{height:42px;border:1px solid #d6e0d6;border-radius:10px;background:#fff;padding:0 10px;font-size:13px;color:#19342d}
+.crm .crm-list-bar button{height:42px;white-space:nowrap}
+.crm .crm-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.crm .crm-chips button{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border:1px solid #d6e0d6;border-radius:999px;background:#fff;color:#2f4d40;font-size:13px;font-weight:600;box-shadow:none}
+.crm .crm-chips button span{min-width:20px;padding:1px 7px;border-radius:999px;background:#eef3ea;color:#2f5a49;font-size:11px;font-weight:700;text-align:center}
+.crm .crm-chips button[aria-pressed=true]{background:#1f4a3d;border-color:#1f4a3d;color:#fff}
+.crm .crm-chips button[aria-pressed=true] span{background:rgba(255,255,255,.2);color:#fff}
+.crm .crm-contact-list{list-style:none;margin:0;padding:0;border:1px solid #e3eae1;border-radius:14px;overflow:hidden;background:#fff}
+.crm .crm-contact-list li{display:flex;align-items:center;gap:10px;border-top:1px solid #edf1eb;padding-right:14px}
+.crm .crm-contact-list li:first-child{border-top:0}
+.crm .crm-contact-list li:hover{background:#f7faf5}
+.crm .crm-contact-main{flex:1;min-width:0;display:grid;grid-template-columns:40px minmax(0,2.2fr) minmax(0,1.3fr) auto;align-items:center;gap:14px;padding:12px 14px;border:0;border-radius:0;background:transparent;color:inherit;text-align:left;font-weight:400;box-shadow:none;cursor:pointer}
+.crm .crm-contact-main:hover{background:transparent}
+.crm .crm-contact-main:focus-visible{outline:2px solid #df7c49;outline-offset:-2px}
+.crm .crm-avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#e8efe4;color:#1f4a3d;font-size:13px;font-weight:800}
+.crm .crm-avatar.provider{background:#fbeadf;color:#a24a22}
+.crm .crm-contact-text,.crm .crm-contact-meta{display:flex;flex-direction:column;min-width:0}
+.crm .crm-contact-text strong{font-size:14px;color:#19342d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crm .crm-contact-text small,.crm .crm-contact-meta small{font-size:12px;color:#6b7d72;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crm .crm-contact-meta{font-size:13px;color:#2f4d40}
+.crm .crm-contact-status{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.crm .crm-stripe{font-size:11px;color:#6b7d72}.crm .crm-stripe.ok{color:#2c7a52}.crm .crm-stripe.warn{color:#a8621b}
+.crm .crm-contact-actions{display:flex;gap:6px;flex:none}
+.crm .crm-contact-actions button{font-size:12px;padding:7px 12px;border-radius:8px}
+.crm .crm-list-count{margin:12px 0 0;font-size:12px}
+@media(max-width:760px){
+ .crm .crm-contact-list li{flex-wrap:wrap;padding:0 0 10px}
+ .crm .crm-contact-main{grid-template-columns:36px minmax(0,1fr) auto;gap:10px}
+ .crm .crm-contact-meta{display:none}
+ .crm .crm-contact-actions{padding-left:60px}
+}
