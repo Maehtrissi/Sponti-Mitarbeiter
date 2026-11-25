@@ -29,7 +29,7 @@ export default function WaitlistCRM(){
  const position=(r:Entry)=>r.status!=='waiting'?null:rows.filter(x=>x.course_id===r.course_id&&x.status==='waiting'&&x.created_at<=r.created_at).length;
  return <section className="panel guest-requests" style={{marginBottom:24}}>
   <h2>Platzanfragen <span className="badge">{active.length} aktiv</span></h2>
-  <p className="muted">Kunden, die für einen ausgebuchten Kurs einen Platz angefragt haben. Wird ein Platz frei, reserviert Sponti ihn automatisch für die früheste passende Anfrage (bis 12 Stunden) und schickt den Buchungslink per E-Mail. Du musst nichts bestätigen.</p>
+  <p className="muted">Kunden, die für einen ausgebuchten Kurs einen Platz angefragt haben. Wird ein Platz frei, reserviert Sponti ihn automatisch für die früheste passende Anfrage und schickt den Buchungslink per E-Mail. Reservierung: 6 h (Kurs in mehr als 3 Tagen), 3 h (1–3 Tage), 1 h (unter 24 h); nachts mindestens bis 9 Uhr. Du musst nichts bestätigen.</p>
   {loading?<p>Lädt …</p>:error?<p className="error" role="alert">{error}</p>:shown.length===0?<p className="muted">{showAll?'In den letzten 30 Tagen gab es keine Platzanfragen.':'Zurzeit keine offenen Platzanfragen.'}</p>:<div className="table-wrap"><table><thead><tr><th>Kurs</th><th>Kunde</th><th>Plätze</th><th>Status</th></tr></thead><tbody>{shown.map(r=>{const c=courses[r.course_id];const pos=position(r);return <tr key={r.id}>
    <td>{c?.title||'Kurs'}<small>{c?fmt(c.starts_at):''}</small></td>
    <td><strong>{r.guest_name}</strong><small><a href={`mailto:${r.guest_email}`}>{r.guest_email}</a></small>{r.guest_phone&&<small>{r.guest_phone}</small>}<small>Angefragt {fmt(r.created_at)}</small></td>
