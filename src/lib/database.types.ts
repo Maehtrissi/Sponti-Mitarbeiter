@@ -44,6 +44,12 @@ export type Database = {
         Update: { id?: string; course_id?: string; guest_name?: string; guest_email?: string; guest_phone?: string; quantity?: number; status?: string; created_at?: string }
         Relationships: []
       }
+      course_waitlist: {
+        Row: { id: string; course_id: string; guest_name: string; guest_email: string; guest_phone: string; quantity: number; status: string; offer_token: string | null; offered_at: string | null; offer_expires_at: string | null; held_quantity: number; leave_token: string; booking_id: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; course_id: string; guest_name: string; guest_email: string; guest_phone?: string; quantity: number; status?: string; offer_token?: string | null; offered_at?: string | null; offer_expires_at?: string | null; held_quantity?: number; leave_token?: string; booking_id?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; course_id?: string; guest_name?: string; guest_email?: string; guest_phone?: string; quantity?: number; status?: string; offer_token?: string | null; offered_at?: string | null; offer_expires_at?: string | null; held_quantity?: number; leave_token?: string; booking_id?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
       homepage_news: {
         Row: {
           id: string
