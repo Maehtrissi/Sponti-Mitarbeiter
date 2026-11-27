@@ -502,6 +502,7 @@ export type Database = {
     }
     Functions: {
       crm_cancel_free_booking: { Args: { p_booking_id: string }; Returns: boolean }
+      crm_cancel_booking_without_refund: { Args: { p_booking_id: string }; Returns: boolean }
       crm_account_deletion_requests: {
         Args: never
         Returns: {
